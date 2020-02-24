@@ -15,6 +15,7 @@ class EveLoginController extends EveBaseController
      */
     public function index()
     {
+        $this->checkAccessToken(1);
         // first step of eve esi access token
         $eveAuthBaseUrl = 'https://login.eveonline.com/oauth/authorize';
         $eveRedirectUri = config('app.eveCallbackUri');

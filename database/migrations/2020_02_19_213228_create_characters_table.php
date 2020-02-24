@@ -14,21 +14,22 @@ class CreateCharactersTable extends Migration
     public function up()
     {
         Schema::create('characters', function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('user_id');
-            $table->integer('character_id')->unique();
-            $table->integer('corporation_id');
-            $table->string('corporation_name');
-            $table->string('character_name');
-            $table->string('access_token');
-            $table->string('refresh_token');
-            $table->integer('expires');
+            $table->bigIncrements('id')->unique();
+            $table->bigInteger('user_id')->unsigned();
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->bigInteger('character_id')->unique();
+            $table->bigInteger('corporation_id')->nullable();
+            $table->string('corporation_name')->nullable();
+            $table->string('character_name')->nullable();
+            $table->string('access_token')->nullable();
+            $table->string('refresh_token')->nullable();
+            $table->integer('expires')->nullable();
             $table->dateTime('last_fetch')->nullable();
             $table->timestamps();
         });
     }
 
-    /**
+    /**c
      * Reverse the migrations.
      *
      * @return void
@@ -36,5 +37,6 @@ class CreateCharactersTable extends Migration
     public function down()
     {
         Schema::dropIfExists('characters');
+        
     }
 }

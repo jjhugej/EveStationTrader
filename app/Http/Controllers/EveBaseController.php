@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
+use App\Character;
 
 class EveBaseController extends Controller
 {
@@ -52,17 +53,37 @@ class EveBaseController extends Controller
             ];
             $resp = $client->get($verifySite, $verify_headers);
             $verify = json_decode($resp->getBody());
-
-            dd($verify,$tokens);
         }
         catch(\Exception $e){
             dd('failed to get character id' . $e);
         }
 
+        try{
+            
+            $character_orders_url = "https://esi.evetech.net/latest" . "/characters/" . $verify->CharacterID . "/orders/";
+            $auth_headers = [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $tokens->access_token,
+                    'User-Agent' => config('app.eveUserAgent'),
+                    'Content-Type' => 'application/x-www-form-urlencoded',
+                ]
+            ];
+            $resp = $client->get($character_orders_url, $auth_headers);
+            $data = json_decode($resp->getBody());
+            return($data);
+        }   
+        catch(\Exception $e){
+            dd('error verifying character information' . $e);
+        }
 
     }
 
     public function getItemNameFromId($itemId){
         
+    }
+
+    public function checkAccessToken($id){
+        $character = \App\Character::find('id', $id)->get();
+        dd($character);
     }
 }
