@@ -15,7 +15,7 @@ class EveLoginController extends EveBaseController
      */
     public function index()
     {
-        $this->checkAccessToken(1);
+        //$this->checkAccessToken(1);
         // first step of eve esi access token
         $eveAuthBaseUrl = 'https://login.eveonline.com/oauth/authorize';
         $eveRedirectUri = config('app.eveCallbackUri');
@@ -36,19 +36,25 @@ class EveLoginController extends EveBaseController
      */
     public function create(Request $request)
     {
+        /*
+            plan:
+            1) check db for access/refresh tokens on our end users account
+            2) if db has no access/refresh tokens prompt login
+            3) verify tokens
+            4) make authenticated call
 
-        $orders = $this->getEsiTokens($request);
-       
+            thoughts:
+                -clean up UI, its hard to have a plan like this.
+                -upon login db must be checked for a linked character against the account
+                    -- if tokens exist verify them with eve first
+                    -- if tokens don't exist prompt an eve login to get tokens
+                -routes and controllers need to be moved around/renamed. its hard to keep track of where things are.
 
+        */
+        //before calling getEsiTokens check db for a refresh token
+        $tokens = $this->getEsiTokens($request);
         //because esi returns an item ID we have to look in our database for an ID and its associated name
-        $itemNames = EveItemIDModel::all();
-       
-        $testarr =[];
-
-        foreach($itemNames as $itemName){
-            array_push($testarr, $itemName);
-        }
-        dd($orders);
+        dd($tokens);
         
         return view('marketorders', compact('orders'));
         

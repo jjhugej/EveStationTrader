@@ -57,7 +57,21 @@ class EveBaseController extends Controller
         catch(\Exception $e){
             dd('failed to get character id' . $e);
         }
+        dd($verify);
 
+    }
+
+    public function getItemNameFromId($itemId){
+        
+    }
+
+    public function checkAccessToken($id){
+        
+            
+        
+    }
+
+    public function getMarketOrders(){
         try{
             
             $character_orders_url = "https://esi.evetech.net/latest" . "/characters/" . $verify->CharacterID . "/orders/";
@@ -75,15 +89,5 @@ class EveBaseController extends Controller
         catch(\Exception $e){
             dd('error verifying character information' . $e);
         }
-
-    }
-
-    public function getItemNameFromId($itemId){
-        
-    }
-
-    public function checkAccessToken($id){
-        $character = \App\Character::find('id', $id)->get();
-        dd($character);
     }
 }
