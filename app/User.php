@@ -38,7 +38,7 @@ class User extends Authenticatable
     ];
 
 
-    public function character (){
+    public function characters (){
         return $this->hasMany('App\Character');
     }
 }

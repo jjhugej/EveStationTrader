@@ -21,9 +21,9 @@ class CreateCharactersTable extends Migration
             $table->bigInteger('corporation_id')->nullable();
             $table->string('corporation_name')->nullable();
             $table->string('character_name')->nullable();
-            $table->string('access_token')->nullable();
-            $table->string('refresh_token')->nullable();
-            $table->integer('expires')->nullable();
+            $table->longText('access_token')->nullable();
+            $table->longText('refresh_token')->nullable();
+            $table->bigInteger('expires')->nullable();
             $table->dateTime('last_fetch')->nullable();
             $table->timestamps();
         });
