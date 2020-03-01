@@ -2,13 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Character;
+use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
-use App\Character;
+
 
 class EveBaseController extends Controller
+            /*
+                Most functions here are made for the purpose of abstracting long bits of code into functions that are
+                callable in the EveLoginController.
+
+                The EveLoginController extends this class.
+
+            */
 {
     public function eveLogin(){
 
@@ -98,8 +108,32 @@ class EveBaseController extends Controller
         }
     }
 
-    public function getMarketOrders($characterCredentials, $tokens){
+     public function attachCharacterToUser($request){
+            $tokens = $this->getEsiTokens($request);
+            $characterCredentials = $this->getCharacterCredentials($tokens);
+            
+            //check if character is already tied to an account
+            $query = Character::where('character_id', $characterCredentials->CharacterID)->get();
+            if(!$query->isEmpty()){
+                dd('This character is already tied to another account');   
+            }
+            else{
+                //if character is not bound to an account, bind it to the authenticated user
+                $characterModel = new Character;
+                $characterModel->user_id = Auth::user()->id;
+                $characterModel->character_id = $characterCredentials->CharacterID;
+                $characterModel->character_name = $characterCredentials->CharacterName;
+                //$characterModel->last_fetch = Carbon::now();
+                //$characterModel->expires = $characterCredentials->ExpiresOn;
+                $characterModel->access_token = $tokens->access_token;
+                $characterModel->refresh_token = $tokens->refresh_token;
+                $characterModel->save();
+            }   
+            
+        }
 
+    public function getMarketOrders($characterCredentials, $tokens){
+        //
         $client = new Client();
         try{
             

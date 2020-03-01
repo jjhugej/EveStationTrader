@@ -10,6 +10,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class EveLoginController extends EveBaseController
+
+                /*
+                    Most functions that start with '$this->xxx' are abstractions of code
+                    that were refactored in to functions to make reading this main controller easier.
+
+                    You can find the underlying code of these functions in the EveBaseController
+                */
+
 {
     /**
      * Display a listing of the resource.
@@ -21,6 +29,7 @@ class EveLoginController extends EveBaseController
         //first check DB for character info (auth_tokens/refresh_tokens)
         if(Auth::check()){
             $user = Auth::user();
+            //get characters assigned to the user
             $characters = $user->characters->where('user_id', $user->id);
            
             //if $characters is empty, we need to route the user through the eve login
@@ -29,7 +38,16 @@ class EveLoginController extends EveBaseController
                 //***once the user logs in we need to save the information to the database associated with the authd user***
             }
             else{
-                //verify the auth/refresh token
+                //else, if the user has characters verify the auth/refresh token and get a new access token if the time limit is up
+                /*
+                    For clarity, a refresh token is only used once the expiration
+                    of the access token is expired.
+                    
+                    the refresh token is then used to get a new access token.
+                */
+
+                return redirect()->away($this->eveLogin());
+                //dd('verify refresh token');
             }
         }
         else{
@@ -44,25 +62,7 @@ class EveLoginController extends EveBaseController
      */
     public function create(Request $request)
     {
-        //before calling getEsiTokens check db for a refresh token
-        $tokens = $this->getEsiTokens($request);
-        $characterCredentials = $this->getCharacterCredentials($tokens);
-        
-        //check if char id alrdy exists)))))
-        $characterModel = new Character;
-
-        //set character variables into DB
-        $characterModel->user_id = Auth::user()->id;
-        $characterModel->character_id = $characterCredentials->CharacterID;
-        $characterModel->character_name = $characterCredentials->CharacterName;
-        //$characterModel->last_fetch = Carbon::now();
-        //$characterModel->expires = $characterCredentials->ExpiresOn;
-
-        //set tokens
-        $characterModel->access_token = $tokens->access_token;
-        $characterModel->refresh_token = $tokens->refresh_token;
-        $characterModel->save();
-        
+        $this->attachCharacterToUser($request);
         dd(Auth::user()->characters());
         
         return view('marketorders', compact('orders'));
