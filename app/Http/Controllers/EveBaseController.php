@@ -109,12 +109,13 @@ class EveBaseController extends Controller
     }
 
      public function attachCharacterToUser($request){
+
             $tokens = $this->getEsiTokens($request);
             $characterCredentials = $this->getCharacterCredentials($tokens);
-            
+    
             //check if character is already tied to an account
-            $query = Character::where('character_id', $characterCredentials->CharacterID)->get();
-            if(!$query->isEmpty()){
+            $characterIdCheck = Character::where('character_id', $characterCredentials->CharacterID)->get();
+            if(!$characterIdCheck->isEmpty()){
                 dd('This character is already tied to another account');   
             }
             else{
@@ -129,14 +130,12 @@ class EveBaseController extends Controller
                 $characterModel->refresh_token = $tokens->refresh_token;
                 $characterModel->save();
             }   
-            
         }
 
     public function getMarketOrders($characterCredentials, $tokens){
-        //
+        //***instead of making a function for each endppoint a function should be made to take a param and input the proper URL inputs***
         $client = new Client();
         try{
-            
             $character_orders_url = "https://esi.evetech.net/latest" . "/characters/" . $characterCredentials->CharacterID . "/orders/";
             $auth_headers = [
                 'headers' => [
