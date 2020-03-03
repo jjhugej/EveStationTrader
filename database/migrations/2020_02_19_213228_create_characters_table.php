@@ -17,12 +17,13 @@ class CreateCharactersTable extends Migration
             $table->bigIncrements('id')->unique();
             $table->bigInteger('user_id')->unsigned()->nullable();
             $table->foreign('user_id')->references('id')->on('users');
-            $table->bigInteger('character_id')->unique();
+            $table->bigInteger('character_id')->nullable();
             $table->bigInteger('corporation_id')->nullable();
             $table->string('corporation_name')->nullable();
             $table->string('character_name')->nullable();
             $table->longText('access_token')->nullable();
             $table->longText('refresh_token')->nullable();
+            $table->boolean('is_selected_character')->default(false);
             $table->dateTime('expires')->nullable();
             $table->dateTime('last_fetch')->nullable();
             $table->timestamps();

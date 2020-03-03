@@ -49,8 +49,9 @@ class EveLoginController extends EveBaseController
      */
     public function create(Request $request)
     {
-        $this->attachCharacterToUser($request);        
-        return view('dashboard');
+        $this->attachCharacterToUser($request);     
+        $characterInfo = auth()->user()->characters()->get();   
+        return view('dashboard',compact('characterInfo'));
     }
 
     /**

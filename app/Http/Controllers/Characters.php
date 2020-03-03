@@ -40,7 +40,24 @@ class Characters extends EveBaseController
      */
     public function store(Request $request)
     {
-        //
+        //this endpoint is used to select a character
+
+        auth()->user()->current_selected_character_id = $request->character_id;
+        auth()->user()->save();
+        
+        //set all characters to unselected
+        $allCharactersOfUser = Character::where('user_id', auth()->user()->id)->get();
+            foreach($allCharactersOfUser as $character){
+                $character->is_selected_character = 0;
+            }
+        
+
+       //sets selected character to true (which is 1 in mysql)
+       $character = auth()->user()->characters()->where('character_id', $request->character_id)->firstOrFail();
+       $character->is_selected_character = 1;
+       $character->save();
+
+        return redirect('dashboard');
     }
 
     /**
