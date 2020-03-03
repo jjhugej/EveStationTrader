@@ -10,6 +10,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 
+
 class Characters extends EveBaseController
 {
     /**
@@ -38,20 +39,23 @@ class Characters extends EveBaseController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+
     public function store(Request $request)
     {
         //this endpoint is used to select a character
 
+        //first we update the user model to reflect the currently selected character_id
         auth()->user()->current_selected_character_id = $request->character_id;
         auth()->user()->save();
         
-        //set all characters to unselected
+        //second we reset all characters in the character model associated to the user to false (character is not selected)
         $allCharactersOfUser = Character::where('user_id', auth()->user()->id)->get();
-            foreach($allCharactersOfUser as $character){
-                $character->is_selected_character = 0;
+            foreach($allCharactersOfUser as $characters){
+                //0 is equal to false in mysql
+                $characters->is_selected_character = 0;
+                $characters->save();
             }
         
-
        //sets selected character to true (which is 1 in mysql)
        $character = auth()->user()->characters()->where('character_id', $request->character_id)->firstOrFail();
        $character->is_selected_character = 1;
@@ -66,6 +70,7 @@ class Characters extends EveBaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
     public function show($id)
     {
         //
@@ -77,6 +82,7 @@ class Characters extends EveBaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
     public function edit($id)
     {
         //
@@ -89,6 +95,7 @@ class Characters extends EveBaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
     public function update(Request $request, $id)
     {
         //
@@ -100,6 +107,7 @@ class Characters extends EveBaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    
     public function destroy(Request $request)
     {
         //dd($request->character_id);

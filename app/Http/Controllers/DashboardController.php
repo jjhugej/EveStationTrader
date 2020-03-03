@@ -22,8 +22,8 @@ class DashboardController extends EveBaseController
      */
     public function index()
     {
+        //this will be the landing page for the end user of this application. Most models will be used here
         $characterInfo = auth()->user()->characters()->get();
-        
 
         return view('dashboard',compact('characterInfo'));
     }
