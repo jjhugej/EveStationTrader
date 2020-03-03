@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Character;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use GuzzleHttp\Client;
@@ -40,7 +41,6 @@ class EveBaseController extends Controller
 
     }
 
-    //base controller that contains helper functions for common interactions between ESI
     public function getEsiTokens($request){
 
        if(isset($_GET['code'])){
@@ -76,14 +76,8 @@ class EveBaseController extends Controller
 
     }
 
-    public function getItemNameFromId($itemId){
-        
-    }
+    public function checkForTokens(){
 
-    public function checkAccessToken($id){
-        
-            
-        
     }
 
     public function getCharacterCredentials($tokens){
@@ -114,7 +108,8 @@ class EveBaseController extends Controller
             $characterCredentials = $this->getCharacterCredentials($tokens);
     
             //check if character is already tied to an account
-            $characterIdCheck = Character::where('character_id', $characterCredentials->CharacterID)->get();
+            $userIdCheck = Character::where('character_id', $characterCredentials->CharacterID)->get();
+           /////////// dd($characterCredentials->CharacterID);
             if(!$characterIdCheck->isEmpty()){
                 dd('This character is already tied to another account');   
             }
@@ -124,13 +119,76 @@ class EveBaseController extends Controller
                 $characterModel->user_id = Auth::user()->id;
                 $characterModel->character_id = $characterCredentials->CharacterID;
                 $characterModel->character_name = $characterCredentials->CharacterName;
-                //$characterModel->last_fetch = Carbon::now();
-                //$characterModel->expires = $characterCredentials->ExpiresOn;
+                $characterModel->last_fetch = Carbon::now();
+                $characterModel->expires = $characterCredentials->ExpiresOn;
                 $characterModel->access_token = $tokens->access_token;
                 $characterModel->refresh_token = $tokens->refresh_token;
                 $characterModel->save();
             }   
         }
+
+    public function getNewAccessTokenWithRefreshToken(){
+        $user = auth()->user()->characters()->get();
+        //currently just taking the hardcoded 0th spot of the character array. Eventually user should pick which character and that variable would take the place of the [0]
+        $refresh_token = $user[0]->refresh_token;
+        $user[0]->last_fetch = Carbon::now();
+        $user[0]->expires = Carbon::now()->addMinutes(20);
+        //dd($users[0]->refresh_token);
+        
+
+        $client = new Client();
+
+            try{
+                $authSite = 'https://login.eveonline.com/oauth/token';
+                $token_headers = [
+                'headers' => [
+                    'Authorization' => 'Basic ' . base64_encode(config('app.eveClientId') . ':' . config('app.eveSecretKey')),
+                    'User-Agent' => config('app.eveUserAgent'),
+                    'Content-Type' => 'application/x-www-form-urlencoded',
+                ],
+                'form_params' => [
+                    'grant_type' => 'refresh_token',
+                    'refresh_token' => $refresh_token,
+                ]
+                ];
+                $resp = $client->post($authSite, $token_headers);
+                $tokens = json_decode($resp->getBody());  
+                return $tokens;
+            }
+            catch(\Exception $e){
+                dd('exception caught' . $e);
+            }
+
+    }
+
+    public function checkTokenExpiration ($character_id){ 
+        //if token has expired will return true, if not will return false.
+        $characterModel = Character::where('character_id', $character_id)->firstOrFail();
+        if(Carbon::now() > $characterModel->expires){
+            dd(Carbon::now(), $characterModel->expires, 'token expired');
+            return true;
+        }else{
+            dd(Carbon::now(), $characterModel->expires, 'token is fine');
+            return false;
+        }
+    }
+
+    public function updateTokenExpiration($character_id){
+        $characterModel = Character::where('character_id', $character_id)->firstOrFail();
+        $characterModel->last_fetch = Carbon::now();
+        $characterModel->expires = Carbon::now()->addMinutes(20);
+        $characterModel->save();
+    }
+
+    public function saveNewTokensToDB($character_id, $newTokens){
+                $characterModel = Character::where('character_id', $character_id)->get();
+                $characterModel[0]->access_token = $newTokens->access_token;
+                $characterModel[0]->refresh_token = $newTokens->refresh_token;
+                $characterModel[0]->last_fetch = Carbon::now();
+                $characterModel[0]->expires = Carbon::now()->addMinutes(20);
+                $characterModel[0]->save();
+                return true;
+    }
 
     public function getMarketOrders($characterCredentials, $tokens){
         //***instead of making a function for each endppoint a function should be made to take a param and input the proper URL inputs***

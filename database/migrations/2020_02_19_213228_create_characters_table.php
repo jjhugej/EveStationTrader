@@ -15,7 +15,7 @@ class CreateCharactersTable extends Migration
     {
         Schema::create('characters', function (Blueprint $table) {
             $table->bigIncrements('id')->unique();
-            $table->bigInteger('user_id')->unsigned();
+            $table->bigInteger('user_id')->unsigned()->nullable();
             $table->foreign('user_id')->references('id')->on('users');
             $table->bigInteger('character_id')->unique();
             $table->bigInteger('corporation_id')->nullable();
@@ -23,7 +23,7 @@ class CreateCharactersTable extends Migration
             $table->string('character_name')->nullable();
             $table->longText('access_token')->nullable();
             $table->longText('refresh_token')->nullable();
-            $table->bigInteger('expires')->nullable();
+            $table->dateTime('expires')->nullable();
             $table->dateTime('last_fetch')->nullable();
             $table->timestamps();
         });

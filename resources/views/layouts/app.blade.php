@@ -29,7 +29,8 @@
                 <a class="navbar-brand" href="{{ url('/') }}">
                     {{ config('app.name') }}
                 </a>
-            <a href="/evelogin"> Log in with Eve </a>
+                <a href="/evelogin"> <h2 class="btn btn-primary mr-2">Log in with Eve</h2></a>
+                <a href="/dashboard"> <h2 class="btn btn-secondary">Go to dashboard</h2></a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
                 </button>

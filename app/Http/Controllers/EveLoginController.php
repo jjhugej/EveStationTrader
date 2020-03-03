@@ -17,8 +17,8 @@ class EveLoginController extends EveBaseController
 
                     You can find the underlying code of these functions in the EveBaseController
 
-
-                    ***current problem:we need to give the user a way to link multiple characters to an account
+                    ***
+                    ***current problem:we need to give the user a way to link multiple characters to an account***
                     ***
                 */
 
@@ -72,7 +72,15 @@ class EveLoginController extends EveBaseController
      */
     public function show()
     {
-        //$orders = $this->getMarketOrders($characterCredentials, $tokens);
+        //currently using this as a testing route
+
+        $this->checkTokenExpiration (90167643);
+
+        /*
+        $newTokens = $this->getNewAccessTokenWithRefreshToken();
+        $this->saveNewTokensToDB(90167643, $newTokens);
+        */
+        
     }
 
     /**

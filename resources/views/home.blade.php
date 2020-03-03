@@ -16,6 +16,7 @@
 
                     You are logged in!
                 </div>
+                <a class ="light"href="/testlink"><h1 class = "btn btn-primary">Test Link!</h1></a>
             </div>
         </div>
     </div>
