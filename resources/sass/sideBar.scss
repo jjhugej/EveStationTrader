@@ -1,0 +1,23 @@
+#sideBarNav {
+    min-height: 100vh;
+    max-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+    border-right: solid 1px rgb(66, 66, 66);
+
+    #profilePicture {
+        margin: 10vh 0;
+        align-self: center;
+        text-align: center;
+    }
+    #sideBarLinkWrapper {
+        min-height: 60vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        a {
+            text-align: center;
+        }
+    }
+}

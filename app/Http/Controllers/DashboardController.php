@@ -23,7 +23,16 @@ class DashboardController extends EveBaseController
     public function index()
     {
         //this will be the landing page for the end user of this application. Most models will be used here
-        $characterInfo = auth()->user()->characters()->get();
+        if(Auth::check()){
+            //first check if user is logged in. If not redirect login. then check for characters. if none, redirect to eve login page.
+            if($characterInfo = auth()->user()->characters()->get() !== null){
+                $characterInfo = auth()->user()->characters()->get();
+            }else{
+                return redirect('/evelogin');
+            }
+        }else{
+            return redirect('/login');
+        }
 
         return view('dashboard',compact('characterInfo'));
     }

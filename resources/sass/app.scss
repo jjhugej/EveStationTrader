@@ -5,4 +5,11 @@
 @import "variables";
 
 // Bootstrap
-@import "~bootstrap/scss/bootstrap";
+//@import "~bootstrap/scss/bootstrap";
+
+//Sidebar
+@import "sideBar";
+
+.row {
+    margin: 0;
+}
