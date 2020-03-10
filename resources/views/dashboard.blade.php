@@ -23,17 +23,43 @@
 
 
 <!-- Middle Box -->
-    <div id="dashboardMidBoxWrapper">
-        <table>
+<div id="dashboardMidBoxWrapper">
+    <h1 class="dashboardHeader">Market Orders:</h1>
+    <table class="table table-responsive table-striped">
+        <thead>
+            <tr>
             <th scope="col">Name</th>
             <th scope="col">Price</th>
             <th scope="col">Volume</th>
-        </table>
-    </div>
+            <th scope="col">Station</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+            <td scope="row"><span>Tornadooooooooooooooooooooooooooooooooo</span></th>
+            <td><span>15,000,000000000000000000000000000000000000000000</span></td>
+            <td><span>40/100</span></td>
+            <td><span>PF-QHK</span></td>
+            </tr>
+            <tr>
+            <td scope="row">Gyrostabilizer</th>
+            <td>1,500,000</td>
+            <td>114/200</td>
+            <td>PF-QHK</td>
+            </tr>
+            <tr>
+            <td scope="row">Hail L</th>
+            <td>1,200</td>
+            <td>96,573/200,000</td>
+            <td>PF-QHK</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 <!-- Bottom Box -->
     <div id="dashboardBotBoxWrapper">
         <h1 class="dashboardHeader">Shopping List:</h1>
-        <div id="dashboardBotBox">      
+        <div id="dashboardBotBox">
             <table class="table">
   <thead>
     <tr>
@@ -45,7 +71,7 @@
   </thead>
   <tbody>
     <tr>
-      <td scope="row">1</th>
+      <th scope="row">1</th>
       <td>Mark</td>
       <td>Otto</td>
       <td>@mdo</td>

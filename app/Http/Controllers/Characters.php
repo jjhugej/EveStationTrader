@@ -42,7 +42,7 @@ class Characters extends EveBaseController
 
     public function store(Request $request)
     {
-        //this endpoint is used to select a character
+        //this endpoint is used to select and save a character
 
         //first we update the user model to reflect the currently selected character_id
         auth()->user()->current_selected_character_id = $request->character_id;
