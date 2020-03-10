@@ -16,7 +16,7 @@
                 <div class="col-md-2">
                     @include('includes.sidebar')
                 </div>
-                <div class="col-md-8 mt-3">
+                <div id = "contentSection" class="col-md-8">
                     @yield('content')   
                 </div>
                 

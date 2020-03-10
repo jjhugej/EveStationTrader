@@ -10,6 +10,23 @@
 //Sidebar
 @import "sideBar";
 
+//Auth (all)
+@import "auth";
+
+//Dashboard
+@import "dashboard";
+
+//general css
+#contentSection {
+    width: 100%;
+    height: 100%;
+    margin: 4vh auto;
+}
+//Resets
 .row {
     margin: 0;
+}
+.col-md-2 {
+    //this gets rid of the padding around the columns for the sidebar
+    padding: 0;
 }
