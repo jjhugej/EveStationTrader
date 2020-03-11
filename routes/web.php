@@ -25,6 +25,9 @@ Route::get('/testlink', 'EveLoginController@show');
 Route::get('/dashboard', 'DashboardController@index');
 
 //Characters
+Route::get('/characters', 'Characters@index');
 Route::get('/dropcharacter/{character_id}', 'Characters@destroy');
 Route::get('/selectcharacter/{character_id}', 'Characters@store');
 
+//Market Orders
+Route::get('/marketorders', 'MarketOrdersController@index');

@@ -76,8 +76,12 @@ class EveBaseController extends Controller
 
     }
 
-    public function checkForTokens(){
-
+    public function checkTokens($character){
+        //this function checks the tokens of a character and updates them if they are expired
+        $tokenExpired = $this->checkTokenExpiration ($character->character_id);
+        if($tokenExpired == true){
+            $this->getNewAccessTokenWithRefreshToken();
+        }
     }
 
     public function getCharacterCredentials($tokens){
@@ -105,26 +109,41 @@ class EveBaseController extends Controller
      public function attachCharacterToUser($request){
             $tokens = $this->getEsiTokens($request);
             $characterCredentials = $this->getCharacterCredentials($tokens);
-            $characterModel = new Character;
-            $characterModel->user_id = Auth::user()->id;
-            $characterModel->character_id = $characterCredentials->CharacterID;
-            $characterModel->character_name = $characterCredentials->CharacterName;
-            $characterModel->last_fetch = Carbon::now();
-            $characterModel->expires = $characterCredentials->ExpiresOn;
-            $characterModel->access_token = $tokens->access_token;
-            $characterModel->refresh_token = $tokens->refresh_token;
-            $characterModel->save();
-              
+
+            //check to see if character info already exists in DB
+            $isCharacterInDB = Character::where('character_id', $characterCredentials->CharacterID)->first();
+            if($isCharacterInDB == null){
+                //if the character_id is not already in the database new up an instance of Character and save it
+
+                $characterModel = new Character;
+
+                $characterModel->user_id = Auth::user()->id;
+                $characterModel->character_id = $characterCredentials->CharacterID;
+                $characterModel->character_name = $characterCredentials->CharacterName;
+                $characterModel->last_fetch = Carbon::now();
+                $characterModel->expires = $characterCredentials->ExpiresOn;
+                $characterModel->access_token = $tokens->access_token;
+                $characterModel->refresh_token = $tokens->refresh_token;
+                $characterModel->save();
+            }
+            else{
+                //fire this code if the char is already in the database
+
+                $characterModel = Character::where('character_id', $characterCredentials->CharacterID)->first();
+
+                $characterModel->user_id = Auth::user()->id;
+                $characterModel->last_fetch = Carbon::now();
+                $characterModel->expires = $characterCredentials->ExpiresOn;
+                $characterModel->access_token = $tokens->access_token;
+                $characterModel->refresh_token = $tokens->refresh_token;
+                $characterModel->save();
+                //dd($characterModel->character_name, $characterCredentials->CharacterName);
+            }             
         }
 
     public function getNewAccessTokenWithRefreshToken(){
-        $user = auth()->user()->characters()->get();
-        //currently just taking the hardcoded 0th spot of the character array. Eventually user should pick which character and that variable would take the place of the [0]
-        $refresh_token = $user[0]->refresh_token;
-        $user[0]->last_fetch = Carbon::now();
-        $user[0]->expires = Carbon::now()->addMinutes(20);
-        //dd($users[0]->refresh_token);
-        
+        $character = auth()->user()->characters()->where('is_selected_character' , 1)->first();        
+        $refresh_token = $character->refresh_token;        
 
         $client = new Client();
 
@@ -142,8 +161,13 @@ class EveBaseController extends Controller
                 ]
                 ];
                 $resp = $client->post($authSite, $token_headers);
-                $tokens = json_decode($resp->getBody());  
-                return $tokens;
+                $tokens = json_decode($resp->getBody()); 
+
+                // set new tokens
+                $character->access_token = $tokens->access_token;
+                $character->refresh_token = $tokens->refresh_token;
+                $character->last_fetch = Carbon::now();
+                $character->expires = Carbon::now()->addMinutes(20);
             }
             catch(\Exception $e){
                 dd('exception caught' . $e);
@@ -155,10 +179,10 @@ class EveBaseController extends Controller
         //if token has expired will return true, if not will return false.
         $characterModel = Character::where('character_id', $character_id)->firstOrFail();
         if(Carbon::now() > $characterModel->expires){
-            dd(Carbon::now(), $characterModel->expires, 'token expired');
+            //dd(Carbon::now(), $characterModel->expires, 'token expired');
             return true;
         }else{
-            dd(Carbon::now(), $characterModel->expires, 'token is fine');
+            //dd(Carbon::now(), $characterModel->expires, 'token is fine');
             return false;
         }
     }
@@ -180,24 +204,5 @@ class EveBaseController extends Controller
                 return true;
     }
 
-    public function getMarketOrders($characterCredentials, $tokens){
-        //***instead of making a function for each endppoint a function should be made to take a param and input the proper URL inputs***
-        $client = new Client();
-        try{
-            $character_orders_url = "https://esi.evetech.net/latest" . "/characters/" . $characterCredentials->CharacterID . "/orders/";
-            $auth_headers = [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $tokens->access_token,
-                    'User-Agent' => config('app.eveUserAgent'),
-                    'Content-Type' => 'application/x-www-form-urlencoded',
-                ]
-            ];
-            $resp = $client->get($character_orders_url, $auth_headers);
-            $data = json_decode($resp->getBody());
-            return($data);
-        }   
-        catch(\Exception $e){
-            dd('error verifying character information' . $e);
-        }
-    }
+    
 }

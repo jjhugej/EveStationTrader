@@ -1,9 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\MarketOrders;
+
 use App\Character;
 use App\User;
-use App\EveItemIDModel;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,9 +13,8 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 
+class MarketOrdersController extends MarketBaseController
 
-
-class DashboardController extends EveBaseController
 {
     /**
      * Display a listing of the resource.
@@ -21,21 +22,18 @@ class DashboardController extends EveBaseController
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
-        //this will be the landing page for the end user of this application. Most models will be used here
-        if(Auth::check()){
-            //first check if user is logged in. If not redirect login. then check for characters. if none, redirect to eve login page.
-            if($characters = auth()->user()->characters()->get() !== null){
-                $characters = auth()->user()->characters()->get();
-            }else{
-                //send to eve login if no characters found
-                dd('no character info found');
-            }
-        }else{
-            return redirect('/login');
-        }
+    {        
+        $currentSelectedCharacter = $this->getSelectedCharacter();
 
-        return view('dashboard',compact('characters'));
+        //check tokens(if true token is expired)
+        $this->checkTokens($currentSelectedCharacter);
+
+        $marketOrders = $this->getMarketOrders($currentSelectedCharacter);
+
+        dd($marketOrders);
+        
+        // ***left off here. market orders are properly coming in, now just need to send to view***
+        return view('marketorders', compact('marketOrders'));
     }
 
     /**
@@ -62,10 +60,10 @@ class DashboardController extends EveBaseController
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\MarketOrders  $marketOrders
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(MarketOrders $marketOrders)
     {
         //
     }
@@ -73,10 +71,10 @@ class DashboardController extends EveBaseController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\MarketOrders  $marketOrders
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(MarketOrders $marketOrders)
     {
         //
     }
@@ -85,10 +83,10 @@ class DashboardController extends EveBaseController
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \App\MarketOrders  $marketOrders
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, MarketOrders $marketOrders)
     {
         //
     }
@@ -96,10 +94,10 @@ class DashboardController extends EveBaseController
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  \App\MarketOrders  $marketOrders
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(MarketOrders $marketOrders)
     {
         //
     }

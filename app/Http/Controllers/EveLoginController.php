@@ -32,10 +32,13 @@ class EveLoginController extends EveBaseController
     {
         //first check DB for character info (auth_tokens/refresh_tokens)
         if(Auth::check()){
-            $user = Auth::user();
-            //get characters assigned to the user
-            $characters = $user->characters->where('user_id', $user->id);
             return redirect()->away($this->eveLogin());
+            /*
+            if(count($characters) < 1){
+                //if no characters are found immediately redirect the user to login via eve
+            }
+            dd('characters found:' . $characters);
+            */
         }
         else{
             return redirect(route('login'));
@@ -50,8 +53,8 @@ class EveLoginController extends EveBaseController
     public function create(Request $request)
     {
         $this->attachCharacterToUser($request);     
-        $characterInfo = auth()->user()->characters()->get();   
-        return view('dashboard',compact('characterInfo'));
+        $characters = auth()->user()->characters()->get();   
+        return view('characters',compact('characters'));
     }
 
     /**
@@ -75,7 +78,7 @@ class EveLoginController extends EveBaseController
     {
         //currently using this as a testing route
 
-        $this->checkTokenExpiration (90167643);
+        //$this->checkTokenExpiration (90167643);
 
         /*
         $newTokens = $this->getNewAccessTokenWithRefreshToken();

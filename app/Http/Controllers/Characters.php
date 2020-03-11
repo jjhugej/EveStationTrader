@@ -20,7 +20,9 @@ class Characters extends EveBaseController
      */
     public function index()
     {
-        //
+        // this method returns all the characters attached to the authenticated user
+        $characters = auth()->user()->characters()->get();
+        return view('characters', compact('characters'));
     }
 
     /**
@@ -61,7 +63,7 @@ class Characters extends EveBaseController
        $character->is_selected_character = 1;
        $character->save();
 
-        return redirect('dashboard');
+        return redirect('characters');
     }
 
     /**
@@ -116,7 +118,7 @@ class Characters extends EveBaseController
         $character = auth()->user()->characters()->where('character_id', $request->character_id)->firstOrFail();
         $character->user_id = null;
         $character->save();
-        return redirect('dashboard');
+        return redirect('characters');
 
     }
 }
