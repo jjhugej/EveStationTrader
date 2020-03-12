@@ -22,12 +22,12 @@ Route::get('/evelogin/response','EveLoginController@create');
 Route::get('/testlink', 'EveLoginController@show');
 
 //DashboardController
-Route::get('/dashboard', 'DashboardController@index');
+Route::get('/dashboard', 'DashboardController@index')->middleware('auth');
 
 //Characters
-Route::get('/characters', 'Characters@index');
-Route::get('/dropcharacter/{character_id}', 'Characters@destroy');
-Route::get('/selectcharacter/{character_id}', 'Characters@store');
+Route::get('/characters', 'Characters@index')->middleware('auth');
+Route::get('/dropcharacter/{character_id}', 'Characters@destroy')->middleware('auth');
+Route::get('/selectcharacter/{character_id}', 'Characters@store')->middleware('auth');
 
 //Market Orders
-Route::get('/marketorders', 'MarketOrdersController@index');
+Route::get('/marketorders', 'MarketOrdersController@index')->middleware('auth');

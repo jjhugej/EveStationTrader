@@ -75,11 +75,61 @@ class EveBaseController extends Controller
         }
 
     }
+    public function checkTokenExpiration ($character_id){ 
+        //if token has expired will return true, if not will return false.
+        $characterModel = Character::where('character_id', $character_id)->firstOrFail();
+        //possible bug when first logging in and not setting refresh token
+        //dd(Carbon::now()->toDateTimeString(), $characterModel->expires, Carbon::now()->toDateTimeString() > $characterModel->expires);
+        if(Carbon::now()->toDateTimeString() > $characterModel->expires){
+            //dd(Carbon::now(), $characterModel->expires, 'token expired');
+            return true;
+        }else{
+            //dd(Carbon::now(), $characterModel->expires, 'token is fine');
+            return false;
+        }
+    }
+    public function getNewAccessTokenWithRefreshToken(){
+        $character = auth()->user()->characters()->where('is_selected_character' , 1)->first();
+      
+        $refresh_token = $character->refresh_token;        
+        
+        $client = new Client();
+
+            try{
+                $authSite = 'https://login.eveonline.com/oauth/token';
+                $token_headers = [
+                'headers' => [
+                    'Authorization' => 'Basic ' . base64_encode(config('app.eveClientId') . ':' . config('app.eveSecretKey')),
+                    'User-Agent' => config('app.eveUserAgent'),
+                    //'Content-Type' => 'application/x-www-form-urlencoded',
+                ],
+                'form_params' => [
+                    'grant_type' => 'refresh_token',
+                    'refresh_token' => $refresh_token,
+                ]
+                ];
+                $resp = $client->post($authSite, $token_headers);
+                $tokens = json_decode($resp->getBody()); 
+                
+                // set new tokens
+                $character->access_token = $tokens->access_token;
+                $character->refresh_token = $tokens->refresh_token;
+                $character->last_fetch = Carbon::now();
+                $character->expires = Carbon::now()->addMinutes(20);
+                $character->save();
+            }
+            catch(\Exception $e){
+                dd('err: 111 - something went wrong with the token exchange', 'exception caught' . $e);
+            }
+
+    }
 
     public function checkTokens($character){
-        //this function checks the tokens of a character and updates them if they are expired
+        //this method checks the tokens of a character and updates them if they are expired
+        //dd($character->character_id);
         $tokenExpired = $this->checkTokenExpiration ($character->character_id);
-        if($tokenExpired == true){
+        //dd($tokenExpired);
+        if($tokenExpired === true){
             $this->getNewAccessTokenWithRefreshToken();
         }
     }
@@ -141,51 +191,7 @@ class EveBaseController extends Controller
             }             
         }
 
-    public function getNewAccessTokenWithRefreshToken(){
-        $character = auth()->user()->characters()->where('is_selected_character' , 1)->first();        
-        $refresh_token = $character->refresh_token;        
-
-        $client = new Client();
-
-            try{
-                $authSite = 'https://login.eveonline.com/oauth/token';
-                $token_headers = [
-                'headers' => [
-                    'Authorization' => 'Basic ' . base64_encode(config('app.eveClientId') . ':' . config('app.eveSecretKey')),
-                    'User-Agent' => config('app.eveUserAgent'),
-                    'Content-Type' => 'application/x-www-form-urlencoded',
-                ],
-                'form_params' => [
-                    'grant_type' => 'refresh_token',
-                    'refresh_token' => $refresh_token,
-                ]
-                ];
-                $resp = $client->post($authSite, $token_headers);
-                $tokens = json_decode($resp->getBody()); 
-
-                // set new tokens
-                $character->access_token = $tokens->access_token;
-                $character->refresh_token = $tokens->refresh_token;
-                $character->last_fetch = Carbon::now();
-                $character->expires = Carbon::now()->addMinutes(20);
-            }
-            catch(\Exception $e){
-                dd('exception caught' . $e);
-            }
-
-    }
-
-    public function checkTokenExpiration ($character_id){ 
-        //if token has expired will return true, if not will return false.
-        $characterModel = Character::where('character_id', $character_id)->firstOrFail();
-        if(Carbon::now() > $characterModel->expires){
-            //dd(Carbon::now(), $characterModel->expires, 'token expired');
-            return true;
-        }else{
-            //dd(Carbon::now(), $characterModel->expires, 'token is fine');
-            return false;
-        }
-    }
+    
 
     public function updateTokenExpiration($character_id){
         $characterModel = Character::where('character_id', $character_id)->firstOrFail();

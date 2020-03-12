@@ -21,19 +21,27 @@ class MarketOrdersController extends MarketBaseController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {        
+        //this method is the homepage for market orders
         $currentSelectedCharacter = $this->getSelectedCharacter();
-
-        //check tokens(if true token is expired)
-        $this->checkTokens($currentSelectedCharacter);
-
-        $marketOrders = $this->getMarketOrders($currentSelectedCharacter);
-
-        dd($marketOrders);
         
-        // ***left off here. market orders are properly coming in, now just need to send to view***
-        return view('marketorders', compact('marketOrders'));
+        //check to make sure the user has a character selected, if not send them back to the character page to select a character
+        if($currentSelectedCharacter !== null && $currentSelectedCharacter->is_selected_character === 1){
+            //check tokens(if true token is expired)
+            $this->checkTokens($currentSelectedCharacter);
+            
+            $marketOrders = $this->getMarketOrders($currentSelectedCharacter);    
+                    
+            return view('marketorders', compact('marketOrders'));
+        }
+        else{
+            //redirect to characters because none are selected and flash an error message
+
+            $request->session()->flash('error', 'You Must Select A Character Before Proceeding');
+
+            return redirect('/characters');
+        }
     }
 
     /**
