@@ -14,7 +14,18 @@ class CreateMarketOrdersTable extends Migration
     public function up()
     {
         Schema::create('market_orders', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->bigInteger('order_id')->unique();
+            $table->bigInteger('user_id')->unsigned();
+            $table->integer('duration');
+            $table->boolean('is_corporation');
+            $table->dateTime('issued');
+            $table->bigInteger('location_id');
+            $table->bigInteger('price');
+            $table->string('range');
+            $table->bigInteger('region_id');
+            $table->bigInteger('type_id');
+            $table->bigInteger('volume_remain');
+            $table->bigInteger('volume_total');
             $table->timestamps();
         });
     }

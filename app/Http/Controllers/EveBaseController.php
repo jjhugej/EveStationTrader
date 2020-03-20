@@ -78,19 +78,17 @@ class EveBaseController extends Controller
     public function checkTokenExpiration ($character_id){ 
         //if token has expired will return true, if not will return false.
         $characterModel = Character::where('character_id', $character_id)->firstOrFail();
+        
         //possible bug when first logging in and not setting refresh token
-        //dd(Carbon::now()->toDateTimeString(), $characterModel->expires, Carbon::now()->toDateTimeString() > $characterModel->expires);
+        //dd(Carbon::now()->toDateTimeString(), $characterModel->expires, Carbon::now()->toDateTimeString() > $characterModel->expires );
         if(Carbon::now()->toDateTimeString() > $characterModel->expires){
-            //dd(Carbon::now(), $characterModel->expires, 'token expired');
             return true;
         }else{
-            //dd(Carbon::now(), $characterModel->expires, 'token is fine');
             return false;
         }
     }
     public function getNewAccessTokenWithRefreshToken(){
-        $character = auth()->user()->characters()->where('is_selected_character' , 1)->first();
-      
+        $character = auth()->user()->characters()->where('is_selected_character' , 1)->first();      
         $refresh_token = $character->refresh_token;        
         
         $client = new Client();
@@ -117,6 +115,7 @@ class EveBaseController extends Controller
                 $character->last_fetch = Carbon::now();
                 $character->expires = Carbon::now()->addMinutes(20);
                 $character->save();
+                return $character;
             }
             catch(\Exception $e){
                 dd('err: 111 - something went wrong with the token exchange', 'exception caught' . $e);
@@ -126,12 +125,14 @@ class EveBaseController extends Controller
 
     public function checkTokens($character){
         //this method checks the tokens of a character and updates them if they are expired
-        //dd($character->character_id);
+
         $tokenExpired = $this->checkTokenExpiration ($character->character_id);
-        //dd($tokenExpired);
+         
         if($tokenExpired === true){
-            $this->getNewAccessTokenWithRefreshToken();
+           $newTokens =  $this->getNewAccessTokenWithRefreshToken();
+            return $newTokens;
         }
+        return $character;
     }
 
     public function getCharacterCredentials($tokens){

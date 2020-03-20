@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\MarketOrders;
 
 use App\Character;
 use App\User;
+use App\MarketOrders;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,15 +24,21 @@ class MarketOrdersController extends MarketBaseController
     public function index(Request $request)
     {        
         //this method is the homepage for market orders
+
         $currentSelectedCharacter = $this->getSelectedCharacter();
         
         //check to make sure the user has a character selected, if not send them back to the character page to select a character
+
         if($currentSelectedCharacter !== null && $currentSelectedCharacter->is_selected_character === 1){
-            //check tokens(if true token is expired)
-            $this->checkTokens($currentSelectedCharacter);
+            //check token expirations for the selected character
+            $currentSelectedCharacter = $this->checkTokens($currentSelectedCharacter);
+     
+            $marketOrders = $this->getMarketOrders($currentSelectedCharacter);
+
+            $this->saveMarketOrdersToDB($marketOrders);
+
             
-            $marketOrders = $this->getMarketOrders($currentSelectedCharacter);    
-                    
+            //dd($marketOrders);
             return view('marketorders', compact('marketOrders'));
         }
         else{

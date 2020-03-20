@@ -47,7 +47,14 @@ class Characters extends EveBaseController
     {
         //this endpoint is used to select and save a character
 
-        //first we update the user model to reflect the currently selected character_id
+        /*
+            Since both the character and user model can reflect a selected character we need
+            to access both models and update them to set the currently selected character.
+
+            First we set the user model, and then we set the character model.
+        */
+
+        //first we update the USER MODEL to reflect the currently selected character_id
         auth()->user()->current_selected_character_id = $request->character_id;
         auth()->user()->save();
         
@@ -59,7 +66,7 @@ class Characters extends EveBaseController
                 $characters->save();
             }
         
-       //sets selected character to true (which is 1 in mysql)
+       //sets selected character on the CHARACTER MODEL to true (which is 1 in mysql)
        $character = auth()->user()->characters()->where('character_id', $request->character_id)->firstOrFail();
        $character->is_selected_character = 1;
        $character->save();
