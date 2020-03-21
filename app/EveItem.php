@@ -10,5 +10,5 @@ class EveItem extends Model
         $this->belongsTo('App\MarketOrders');
     }
     protected $primaryKey = 'typeID';
-    protected $table = 'eveItems';
+    protected $table = 'eveitems';
 }

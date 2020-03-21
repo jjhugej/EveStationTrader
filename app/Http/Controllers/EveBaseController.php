@@ -211,5 +211,17 @@ class EveBaseController extends Controller
                 return true;
     }
 
+    function convertEsiDateTime($dateTime){
+        /*
+            this function converts the given timestamp from ESI to a properly formatted datetime for mysql
+            for whatever reason CCP sends the timestamp with the letters T and Z surrounding the time portion of the datetime.
+            This uses regex to replace the letters with a space, and then trims the final space at the end.
+        */
+            $pattern = '/[a-zA-Z]+/';
+            $replacement = ' ';
+            $convertedTime = trim(preg_replace($pattern, $replacement, $dateTime));
+            return $convertedTime;
+        }
+
     
 }

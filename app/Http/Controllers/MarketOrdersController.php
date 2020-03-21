@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use App\Character;
 use App\User;
 use App\MarketOrders;
+use App\EveItem;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,29 +22,27 @@ class MarketOrdersController extends MarketBaseController
      *
      * @return \Illuminate\Http\Response
      */
+
     public function index(Request $request)
     {        
-        //this method is the homepage for market orders
-
         $currentSelectedCharacter = $this->getSelectedCharacter();
         
         //check to make sure the user has a character selected, if not send them back to the character page to select a character
-
         if($currentSelectedCharacter !== null && $currentSelectedCharacter->is_selected_character === 1){
-            //check token expirations for the selected character
+
             $currentSelectedCharacter = $this->checkTokens($currentSelectedCharacter);
      
             $marketOrders = $this->getMarketOrders($currentSelectedCharacter);
 
             $this->saveMarketOrdersToDB($marketOrders);
 
-            
-            //dd($marketOrders);
+            //convert type_id to item name should look like: $this->convertTypeIDToItemName($type_id)
+            $marketOrders = $this->convertTypeIDToItemName($marketOrders);
+
             return view('marketorders', compact('marketOrders'));
         }
         else{
             //redirect to characters because none are selected and flash an error message
-
             $request->session()->flash('error', 'You Must Select A Character Before Proceeding');
 
             return redirect('/characters');

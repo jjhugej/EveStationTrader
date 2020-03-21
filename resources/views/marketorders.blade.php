@@ -6,9 +6,9 @@
 
         <div class="card">
             <div class="card-body">
-               <p>Type Id: {{ $marketOrder->type_id}}</p>
-               <p>Price: {{ $marketOrder->price}}</p>
-               <p>Price: {{ $marketOrder->volume_remain .'/' . $marketOrder->volume_total}}</p>
+               <p>Item: {{ $marketOrder->typeName}}</p>
+               <p>Price: @convertNumberToCurrency($marketOrder->price)</p>
+               <p>Volume: {{ $marketOrder->volume_remain .'/' . $marketOrder->volume_total}}</p>
             </div>
         </div>
 
