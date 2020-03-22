@@ -24,9 +24,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //this allows us to easily convert any number in our blade templates to a currency
-        Blade::directive('convertNumberToCurrency', function ($money) {
-            return "<?php echo number_format($money, 2); ?>";
+        Blade::directive('convertNumberToCurrency', function ($number) {
+            //this allows us to easily convert any number in our blade templates to a currency
+            // to use in blade start with @convertNumberToCurrency($num)
+            return "<?php echo number_format($number, 2); ?>";
+        });
+
+        Blade::directive('formatNumber', function ($number) {
+            //this converts a number without comma seperation to one with
+            // i.e. 20000 -> 20,000
+            // to use in blade start with @formatNumber($num)
+            return "<?php echo number_format($number); ?>";
         });
     }
 }

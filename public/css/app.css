@@ -104,6 +104,17 @@ table td span {
   text-overflow: ellipsis;
 }
 
+.table td,
+.table th {
+  vertical-align: middle !important;
+  width: 0;
+}
+
+.table td .fit,
+.table th .fit {
+  width: 10%;
+}
+
 #contentSection {
   width: 100%;
   height: 100%;

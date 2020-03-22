@@ -1,0 +1,8 @@
+.table td,
+.table th {
+    vertical-align: middle !important;
+    width: 0;
+    .fit {
+        width: 10%;
+    }
+}
