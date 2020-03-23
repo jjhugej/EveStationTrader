@@ -14,5 +14,8 @@ class MarketOrders extends Model
     public function eveItem (){
         return $this->hasMany('App\EveItem', 'typeID');
     }
+    public function structureName (){
+        return $this->hasMany('App\StructureName', 'location_id');
+    }
 }
     

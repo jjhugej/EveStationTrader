@@ -6,6 +6,7 @@ use App\Character;
 use App\User;
 use App\MarketOrders;
 use App\EveItem;
+use App\StructureName;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -116,71 +117,91 @@ class MarketBaseController extends EveBaseController
 
     public function resolveStationIDToName($character, $marketOrders){
         //THIS WILL RETURN THE OBJECT BACK WITH A PROPERTY OF "stationName" WHICH IS NOT PERSISTED ON THE "eveItem" TABLE
+        //BUT WILL BE PERSISTED ON THE STRUCTURENAME TABLE IF IT HASN'T BEEN UPDATED IN 30 DAYS
 
-        //initialize the locationID and locationName arrays
         $locationIDArray = [];
         $locationNameArray = [];
-        
+
         //first, loop through market orders plucking the location ID of each only once, and pushing to an array
         foreach($marketOrders as $marketOrder){
             if(!in_array($marketOrder->location_id, $locationIDArray)){
                 array_push($locationIDArray,$marketOrder->location_id);
             }
         }
-        //dd(implode('|',$locationIDArray));
-
+        //dd($locationIDArray);
         
-        
-        foreach($locationIDArray as $locationIDArrayItem){
-            //if locationIdArray[i] is <100,000,000 it is not a structure, it is a station
+        //check if the location ID is already in the database
+        foreach($locationIDArray as $locationID){
+            if(StructureName::where('location_id', $locationID)->first() !==null){
+                $locationIDInstance = StructureName::where('location_id', $locationID)->first();
+                array_push($locationNameArray, $locationIDInstance->location_name); 
 
-            if($locationIDArrayItem > 100000000){
-                //guzzle request for structures
-                $client = new Client();
-                try{
-                    $station_url = "https://esi.evetech.net/latest" . "/universe/structures/" . $locationIDArrayItem;
-                    $auth_headers = [
-                        'headers' => [
-                            'Authorization' => 'Bearer ' . $character->access_token,
-                            'User-Agent' => config('app.eveUserAgent'),
-                            'Content-Type' => 'application/x-www-form-urlencoded',
-                        ]
-                    ];
-                    $resp = $client->get($station_url, $auth_headers);
-                    $data = json_decode($resp->getBody());
-                    //dd($station_url,$resp, $data);
-                    array_push($locationNameArray,$data->name);
-                    //return($data);
-                }   
-                catch(Exception $e){
-                    dd('error verifying character information' . $e);
-                }
             }else{
-                //guzzle request for stations
-                $client = new Client();
-                try{
-                    $station_url = "https://esi.evetech.net/latest" . "/universe/stations/" . $locationIDArrayItem;
-                    $auth_headers = [
-                        'headers' => [
-                            'Authorization' => 'Bearer ' . $character->access_token,
-                            'User-Agent' => config('app.eveUserAgent'),
-                            'Content-Type' => 'application/x-www-form-urlencoded',
-                        ]
-                    ];
-                    $resp = $client->get($station_url, $auth_headers);
-                    $data = json_decode($resp->getBody());
-                    //dd($station_url,$resp, $data);
-                    array_push($locationNameArray,$data->name);
-                    //return($data);
-                }   
-                catch(Exception $e){
-                    dd('error verifying character information' . $e);
+        
+                //if locationIdArray[i] is <100,000,000 it is not a structure, it is a station
+                if($locationID > 100000000){
+                    //guzzle request for structures
+                    $client = new Client();
+                    try{
+                        $station_url = "https://esi.evetech.net/latest" . "/universe/structures/" . $locationID;
+                        $auth_headers = [
+                            'headers' => [
+                                'Authorization' => 'Bearer ' . $character->access_token,
+                                'User-Agent' => config('app.eveUserAgent'),
+                                'Content-Type' => 'application/x-www-form-urlencoded',
+                            ]
+                        ];
+                        $resp = $client->get($station_url, $auth_headers);
+                        $data = json_decode($resp->getBody());
+
+                        array_push($locationNameArray,$data->name);
+
+                        //save the location to the DB
+                        $locationIDInstance = new StructureName();
+                        $locationIDInstance->location_id = $locationID;
+                        $locationIDInstance->location_name = $data->name;
+                        //$locationIDInstance->solar_system_id --> not working. not sure why. it is unecessary and was removed from migration
+                        $locationIDInstance->type_id = $data->type_id;
+                        $locationIDInstance->expiration = 30;
+                        $locationIDInstance->save();
+                    }   
+                    catch(Exception $e){
+                        dd('error verifying character information' . $e);
+                    }
+                }else{
+                    //guzzle request for stations
+                    $client = new Client();
+                    try{
+                        $station_url = "https://esi.evetech.net/latest" . "/universe/stations/" . $locationID;
+                        $auth_headers = [
+                            'headers' => [
+                                'Authorization' => 'Bearer ' . $character->access_token,
+                                'User-Agent' => config('app.eveUserAgent'),
+                                'Content-Type' => 'application/x-www-form-urlencoded',
+                            ]
+                        ];
+                        $resp = $client->get($station_url, $auth_headers);
+                        $data = json_decode($resp->getBody());
+
+                        array_push($locationNameArray,$data->name);
+
+                        //save the location to the DB
+                        $locationIDInstance = new StructureName();
+                        $locationIDInstance->location_id = $locationID;
+                        $locationIDInstance->location_name = $data->name;
+                        $locationIDInstance->type_id = $data->type_id;
+                        $locationIDInstance->expiration = 30;
+                        $locationIDInstance->save();
+    
+                    }   
+                    catch(Exception $e){
+                        dd('error verifying character information' . $e);
+                    }
                 }
+        
+                
             }
-
         }
-        //dd($locationIDArray, $locationNameArray, array_combine($locationIDArray, $locationNameArray));
-
         //combine the idArray with the name Array to get an associative array. return the associative array
         //****if the key->value pair is not in the DB, save it for future checks to reduce the amount of requests to ESI*********************
         $idToNameArray = array_combine($locationIDArray, $locationNameArray);
