@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Character;
 use App\User;
+use App\EveItem;
+use App\StructureName;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -222,6 +224,129 @@ class EveBaseController extends Controller
             $convertedTime = trim(preg_replace($pattern, $replacement, $dateTime));
             return $convertedTime;
         }
+
+
+     public function resolveTypeIDToItemName($eveObjectDatas){
+        /*
+            CCP sends back a type_id which corresponds to an item name from their static dump file.
+            The table name for the item names from the dump is: invTypes. Renamed to eveItems in our DB
+            NOTE: because this is a static table it must be imported every time a migration refresh is done.
+
+            SECOND NOTE: THIS WILL RETURN THE OBJECT BACK WITH A PROPERTY OF "typeName" WHICH IS NOT PERSISTED ON THE "eveItem" TABLE
+        */
+        //dd($marketOrders);
+
+        foreach($eveObjectDatas as $eveObjectData){
+            $typeName = EveItem::where('typeID', $eveObjectData->type_id)->pluck('typeName')->first();
+            $eveObjectData->typeName = $typeName;
+        }
+        return $eveObjectDatas;
+    }
+    
+
+     public function resolveStationIDToName($character, $eveObjectDatas){
+        //THIS WILL RETURN THE OBJECT BACK WITH A PROPERTY OF "stationName" WHICH IS NOT PERSISTED ON THE "eveItem" TABLE
+        //BUT WILL BE PERSISTED ON THE STRUCTURENAME TABLE IF IT HASN'T BEEN UPDATED IN 30 DAYS
+
+        $locationIDArray = [];
+        $locationNameArray = [];
+
+        //first, loop through objects plucking the location ID of each only once, and pushing to an array
+        foreach($eveObjectDatas as $eveObjectData){
+            if(!in_array($eveObjectData->location_id, $locationIDArray)){
+                array_push($locationIDArray,$eveObjectData->location_id);
+            }
+        }
+        
+        //check if the location ID is already in the database and if it has been checked since its expiration date
+        foreach($locationIDArray as $locationID){
+
+            $structureInDB = StructureName::where('location_id', $locationID)->first();
+
+            if($structureInDB->location_id !==null && Carbon::now() > Carbon::now()->addDays($structureInDB->expiration) === false){
+                //if the location exists and has not expired, return the name to the locationNameArray so it can be passed
+                //to the view without making a request to ESI
+                $locationIDInstance = StructureName::where('location_id', $locationID)->first();
+                array_push($locationNameArray, $locationIDInstance->location_name); 
+
+            }else{
+        
+                //if locationIdArray[i] is <100,000,000 it is not a structure, it is a station
+                if($locationID > 100000000){
+
+                    //guzzle request for structures
+                    $client = new Client();
+                    try{
+                        $station_url = "https://esi.evetech.net/latest" . "/universe/structures/" . $locationID;
+                        $auth_headers = [
+                            'headers' => [
+                                'Authorization' => 'Bearer ' . $character->access_token,
+                                'User-Agent' => config('app.eveUserAgent'),
+                                'Content-Type' => 'application/x-www-form-urlencoded',
+                            ]
+                        ];
+                        $resp = $client->get($station_url, $auth_headers);
+                        $data = json_decode($resp->getBody());
+
+                        array_push($locationNameArray,$data->name);
+
+                        //save the location to the DB
+                        $locationIDInstance = new StructureName();
+                        $locationIDInstance->location_id = $locationID;
+                        $locationIDInstance->location_name = $data->name;
+                        //$locationIDInstance->solar_system_id --> not working. not sure why. it is unecessary and was removed from migration
+                        $locationIDInstance->type_id = $data->type_id;
+                        $locationIDInstance->expiration = 30;
+                        $locationIDInstance->save();
+                    }   
+                    catch(Exception $e){
+                        dd('error verifying character information' . $e);
+                    }
+                }else{
+
+                    //guzzle request for stations
+                    $client = new Client();
+                    try{
+                        $station_url = "https://esi.evetech.net/latest" . "/universe/stations/" . $locationID;
+                        $auth_headers = [
+                            'headers' => [
+                                'Authorization' => 'Bearer ' . $character->access_token,
+                                'User-Agent' => config('app.eveUserAgent'),
+                                'Content-Type' => 'application/x-www-form-urlencoded',
+                            ]
+                        ];
+                        $resp = $client->get($station_url, $auth_headers);
+                        $data = json_decode($resp->getBody());
+
+                        array_push($locationNameArray,$data->name);
+
+                        //save the location to the DB
+                        $locationIDInstance = new StructureName();
+                        $locationIDInstance->location_id = $locationID;
+                        $locationIDInstance->location_name = $data->name;
+                        $locationIDInstance->type_id = $data->type_id;
+                        $locationIDInstance->expiration = 30;
+                        $locationIDInstance->save();
+    
+                    }   
+                    catch(Exception $e){
+                        dd('error verifying character information' . $e);
+                    }
+                }
+        
+                
+            }
+        }
+        //combine the idArray with the name Array to get an associative array. return the associative array
+        //****if the key->value pair is not in the DB, save it for future checks to reduce the amount of requests to ESI*********************
+        $idToNameArray = array_combine($locationIDArray, $locationNameArray);
+
+        //finally set a non-persisted attribute, "locationName" to the marketOrder object. and then return all market orders
+        foreach($eveObjectDatas as $eveObjectData){
+            $eveObjectData->locationName = $idToNameArray[$eveObjectData->location_id]; 
+        }
+        return $eveObjectDatas;
+    }
 
     
 }

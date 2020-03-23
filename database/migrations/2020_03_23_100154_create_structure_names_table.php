@@ -15,7 +15,7 @@ class CreateStructureNamesTable extends Migration
     {
         Schema::create('structure_names', function (Blueprint $table) {
             $table->bigIncrements('id')->unique();
-            $table->bigInteger('location_id')->unique()->unsigned();
+            $table->bigInteger('location_id')->unsigned();
             $table->string('location_name');
             //$table->bigInteger('solar_system_id')->nullable(); --> had problems with this, removed for now
             $table->bigInteger('type_id');

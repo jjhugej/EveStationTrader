@@ -5,7 +5,7 @@
       <a href="#">Accounting</a>
       <a href="/characters">Characters</a>
       <a href="#">Inventory</a>
-      <a href="#">Logistics</a>
+      <a href="/logistics">Logistics</a>
       <a href="/marketorders">Market Orders</a>
       <a href="#">Shopping List</a>
       <a href="#">Stations</a>

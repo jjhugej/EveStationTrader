@@ -36,7 +36,6 @@ class MarketOrdersController extends MarketBaseController
 
             $this->saveMarketOrdersToDB($marketOrders);
 
-            //convert type_id to item name should look like: $this->convertTypeIDToItemName($type_id)
             $marketOrders = $this->resolveTypeIDToItemName($marketOrders);
 
             $marketOrders = $this->resolveStationIDToName($currentSelectedCharacter, $marketOrders);
