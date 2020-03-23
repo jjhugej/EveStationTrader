@@ -128,11 +128,15 @@ class MarketBaseController extends EveBaseController
                 array_push($locationIDArray,$marketOrder->location_id);
             }
         }
-        //dd($locationIDArray);
         
-        //check if the location ID is already in the database
+        //check if the location ID is already in the database and if it has been checked since its expiration date
         foreach($locationIDArray as $locationID){
-            if(StructureName::where('location_id', $locationID)->first() !==null){
+
+            $structureInDB = StructureName::where('location_id', $locationID)->first();
+
+            if($structureInDB !==null && Carbon::now() > Carbon::now()->addDays($structureInDB->expiration) === true){
+                //if the location exists and has not expired, return the name to the locationNameArray so it can be passed
+                //to the view without making a request to ESI
                 $locationIDInstance = StructureName::where('location_id', $locationID)->first();
                 array_push($locationNameArray, $locationIDInstance->location_name); 
 
@@ -140,6 +144,7 @@ class MarketBaseController extends EveBaseController
         
                 //if locationIdArray[i] is <100,000,000 it is not a structure, it is a station
                 if($locationID > 100000000){
+
                     //guzzle request for structures
                     $client = new Client();
                     try{
@@ -169,6 +174,7 @@ class MarketBaseController extends EveBaseController
                         dd('error verifying character information' . $e);
                     }
                 }else{
+
                     //guzzle request for stations
                     $client = new Client();
                     try{
