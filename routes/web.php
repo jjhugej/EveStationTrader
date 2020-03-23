@@ -35,3 +35,4 @@ Route::get('/marketorders', 'MarketOrdersController@index')->middleware('auth');
 //Logistics
 Route::get('/logistics', 'LogisticsController@index')->middleware('auth');
 Route::get('/logistics/create', 'LogisticsController@create')->middleware('auth');
+Route::post('/logistics/create', 'LogisticsController@store')->middleware('auth');

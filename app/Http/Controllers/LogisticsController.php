@@ -3,7 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Logistics;
+use App\Character;
+use App\User;
+use App\MarketOrders;
+use App\EveItem;
+use App\StructureName;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ServerException;
 
 class LogisticsController extends Controller
 {
@@ -35,7 +45,24 @@ class LogisticsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validatedData = $request->validate([
+        'title' => 'required|unique:posts|max:255',
+        'body' => 'required',
+    ]);
+        $logisticsInstance = new Logistics();
+        $logisticsInstance->user_id = Auth::user()->id;
+        $logisticsInstance->name = $request->name;
+        $logisticsInstance->start_station = $request->start_station;
+        $logisticsInstance->end_station = $request->end_station;
+        $logisticsInstance->price = $request->price;
+        $logisticsInstance->volume_limit = $request->volume_limit;
+        $logisticsInstance->status = $request->status;
+        $logisticsInstance->notes = $request->notes;
+        $logisticsInstance->save();
+      
+
+        //redirect to index
+        return redirect('/logistics');
     }
 
     /**
