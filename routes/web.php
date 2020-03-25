@@ -36,3 +36,12 @@ Route::get('/marketorders', 'MarketOrdersController@index')->middleware('auth');
 Route::get('/logistics', 'LogisticsController@index')->middleware('auth');
 Route::get('/logistics/create', 'LogisticsController@create')->middleware('auth');
 Route::post('/logistics/create', 'LogisticsController@store')->middleware('auth');
+Route::get('/logistics/{deliveryGroup}', 'LogisticsController@show')->middleware('auth');
+Route::get('/logistics/{deliveryGroup}/edit', 'LogisticsController@edit')->middleware('auth');
+Route::put('/logistics/{deliveryGroup}/edit', 'LogisticsController@update')->middleware('auth');
+
+//Inventory
+Route::get('/inventory', 'InventoryController@index')->middleware('auth');
+Route::get('/inventory/create', 'InventoryController@create')->middleware('auth');
+Route::post('/inventory/create', 'InventoryController@store')->middleware('auth');
+Route::get('/inventory/show/{inventoryItem}', 'InventoryController@show')->middleware('auth');

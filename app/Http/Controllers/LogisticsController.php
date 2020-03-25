@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Logistics;
 use App\Character;
 use App\User;
+use App\Inventory;
 use App\MarketOrders;
 use App\EveItem;
 use App\StructureName;
@@ -15,7 +16,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 
-class LogisticsController extends Controller
+class LogisticsController extends EveBaseController
 {
     /**
      * Display a listing of the resource.
@@ -24,7 +25,9 @@ class LogisticsController extends Controller
      */
     public function index()
     {
-        return view('logistics.logistics');
+        $deliveryGroups = Logistics::where('user_id', Auth::user()->id)->orderBy('created_at','desc')->get();
+        //dd($logisticsData);
+        return view('logistics.logistics', compact('deliveryGroups'));
     }
 
     /**
@@ -45,19 +48,28 @@ class LogisticsController extends Controller
      */
     public function store(Request $request)
     {
+
         $validatedData = $request->validate([
-        'title' => 'required|unique:posts|max:255',
-        'body' => 'required',
+        'name' => 'required|max:255',
+        'start_station' => 'required|max:255',
+        'end_station' => 'required|max:255',
+        'price' => 'integer|nullable',
+        'volume_limit' => 'integer|nullable',
+        'status' => 'required',
+        'notes' => 'nullable|max:1000',
     ]);
+            
         $logisticsInstance = new Logistics();
+
         $logisticsInstance->user_id = Auth::user()->id;
-        $logisticsInstance->name = $request->name;
-        $logisticsInstance->start_station = $request->start_station;
-        $logisticsInstance->end_station = $request->end_station;
-        $logisticsInstance->price = $request->price;
-        $logisticsInstance->volume_limit = $request->volume_limit;
-        $logisticsInstance->status = $request->status;
-        $logisticsInstance->notes = $request->notes;
+        $logisticsInstance->name = $validatedData['name'];
+        $logisticsInstance->start_station = $validatedData['start_station'];
+        $logisticsInstance->end_station = $validatedData['end_station'];
+        $logisticsInstance->price = $validatedData['price'];
+        $logisticsInstance->volume_limit = $validatedData['volume_limit'];
+        $logisticsInstance->status = $validatedData['status'];
+        $logisticsInstance->notes = $validatedData['notes'];
+
         $logisticsInstance->save();
       
 
@@ -71,9 +83,13 @@ class LogisticsController extends Controller
      * @param  \App\Logistics  $logistics
      * @return \Illuminate\Http\Response
      */
-    public function show(Logistics $logistics)
+    public function show(Logistics $deliveryGroup)
     {
-        //
+        $itemsInDeliveryGroup = Inventory::where('logistics_group_id', $deliveryGroup->id)->get();
+
+        //dd($itemsInDeliveryGroup);
+
+        return view('logistics.logistics_details', compact('deliveryGroup', 'itemsInDeliveryGroup'));
     }
 
     /**
@@ -82,9 +98,10 @@ class LogisticsController extends Controller
      * @param  \App\Logistics  $logistics
      * @return \Illuminate\Http\Response
      */
-    public function edit(Logistics $logistics)
+    public function edit(Logistics $deliveryGroup)
     {
-        //
+        //dd($deliveryGroup);
+        return view('logistics.logistics_edit', compact('deliveryGroup'));
     }
 
     /**
@@ -94,9 +111,30 @@ class LogisticsController extends Controller
      * @param  \App\Logistics  $logistics
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Logistics $logistics)
+    public function update(Request $request, Logistics $deliveryGroup)
     {
-        //
+        $validatedData = $request->validate([
+        'name' => 'required|max:255',
+        'start_station' => 'required|max:255',
+        'end_station' => 'required|max:255',
+        'price' => 'integer|nullable',
+        'volume_limit' => 'integer|nullable',
+        'status' => 'required',
+        'notes' => 'nullable|max:1000',
+    ]);     
+           
+        $logisticsInstance = Logistics::where('id', $deliveryGroup->id)->first();
+        $logisticsInstance->user_id = Auth::user()->id;
+        $logisticsInstance->name = $validatedData['name'];
+        $logisticsInstance->start_station = $validatedData['start_station'];
+        $logisticsInstance->end_station = $validatedData['end_station'];
+        $logisticsInstance->price = $validatedData['price'];
+        $logisticsInstance->volume_limit = $validatedData['volume_limit'];
+        $logisticsInstance->status = $validatedData['status'];
+        $logisticsInstance->notes = $validatedData['notes'];
+        $logisticsInstance->save();
+
+        return redirect('/logistics');
     }
 
     /**

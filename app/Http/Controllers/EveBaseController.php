@@ -260,10 +260,10 @@ class EveBaseController extends Controller
         
         //check if the location ID is already in the database and if it has been checked since its expiration date
         foreach($locationIDArray as $locationID){
-
+            
             $structureInDB = StructureName::where('location_id', $locationID)->first();
-
-            if($structureInDB->location_id !==null && Carbon::now() > Carbon::now()->addDays($structureInDB->expiration) === false){
+            
+            if($structureInDB !== null && $structureInDB->location_id !==null && Carbon::now() > Carbon::now()->addDays($structureInDB->expiration) === false){
                 //if the location exists and has not expired, return the name to the locationNameArray so it can be passed
                 //to the view without making a request to ESI
                 $locationIDInstance = StructureName::where('location_id', $locationID)->first();
@@ -287,7 +287,7 @@ class EveBaseController extends Controller
                         ];
                         $resp = $client->get($station_url, $auth_headers);
                         $data = json_decode($resp->getBody());
-
+                        
                         array_push($locationNameArray,$data->name);
 
                         //save the location to the DB

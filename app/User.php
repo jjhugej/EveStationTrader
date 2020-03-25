@@ -41,4 +41,7 @@ class User extends Authenticatable
     public function characters (){
         return $this->hasMany('App\Character');
     }
+    public function logistics (){
+        return $this->hasMany('App\Logistics');
+    }
 }
