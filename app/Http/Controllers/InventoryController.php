@@ -27,9 +27,9 @@ class InventoryController extends InventoryBaseController
     public function index()
     {
         $inventoryItems = Inventory::where('user_id', Auth::user()->id)->get();
-        $inventoryItems = $this->resolveLogisticsGroupIDToName($inventoryItems);
+        $items = $this->resolveMultipleLogisticsGroupIDToName($inventoryItems);
         
-        return view('inventory.inventory', compact('inventoryItems'));
+        return view('inventory.inventory', compact('items'));
     }
 
     /**
@@ -42,7 +42,20 @@ class InventoryController extends InventoryBaseController
         //send delivery groups to view so users can link the item to a delivery group
         $deliveryGroups = Logistics::where('user_id', Auth::user()->id)->orderBy('created_at','desc')->get();
 
-        return view('inventory.inventory_create', compact('deliveryGroups'));
+        //retrieve market orders of user's selected character and resolve the item name and station name
+        $currentSelectedCharacter = $this->getSelectedCharacter();
+        if($currentSelectedCharacter !== null && $currentSelectedCharacter->is_selected_character === 1){
+            $marketOrders = MarketOrders::where('user_id', Auth::user()->id)->orderBy('created_at','desc')->get();
+            $marketOrders = $this->resolveTypeIDToItemName($marketOrders);
+            $marketOrders = $this->resolveStationIDToName($currentSelectedCharacter, $marketOrders);
+
+        return view('inventory.inventory_create', compact('deliveryGroups', 'marketOrders'));
+        }else{
+            //redirect to characters because none are selected and flash an error message
+            $request->session()->flash('error', 'You Must Select A Character Before Proceeding');
+
+            return redirect('/characters');
+        }
     }
 
     /**
@@ -73,6 +86,7 @@ class InventoryController extends InventoryBaseController
         $inventoryInstance->sell_price = $validatedData['sell_price'];
         $inventoryInstance->amount = $validatedData['amount'];
         $inventoryInstance->taxes_paid = $validatedData['taxes_paid'];
+        $inventoryInstance->notes = $validatedData['notes'];
         if(array_key_exists('delivery_group_select', $validatedData)){
             $inventoryInstance->logistics_group_id = $validatedData['delivery_group_select'];
         }
@@ -89,11 +103,9 @@ class InventoryController extends InventoryBaseController
      */
     public function show(Inventory $inventoryItem)
     {
-
-        $item = $this->resolveLogisticsGroupIDToName($inventoryItem);
+        $item = $this->resolveSingleLogisticsGroupIDToName($inventoryItem);
         //dd($item);
         return view('inventory.inventory_details', compact('item'));
-
     }
 
     /**
@@ -102,9 +114,12 @@ class InventoryController extends InventoryBaseController
      * @param  \App\Inventory  $inventory
      * @return \Illuminate\Http\Response
      */
-    public function edit(Inventory $inventory)
+    public function edit(Inventory $inventoryItem)
     {
-        //
+        //dd($inventoryItem->id);
+        $deliveryGroups = Logistics::where('user_id', Auth::user()->id)->orderBy('created_at','desc')->get();
+
+        return view('inventory.inventory_edit', compact('inventoryItem','deliveryGroups')); 
     }
 
     /**
@@ -114,9 +129,36 @@ class InventoryController extends InventoryBaseController
      * @param  \App\Inventory  $inventory
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Inventory $inventory)
+    public function update(Request $request, Inventory $inventoryItem)
     {
-        //
+        $validatedData = $request->validate([
+        'name' => 'required|max:255',
+        'purchase_price' => 'required|max:255',
+        'sell_price' => 'nullable|max:255',
+        'par' => 'integer|nullable',
+        'amount' => 'integer|nullable',
+        'taxes_paid' => 'integer|nullable',
+        'delivery_group_select' => 'nullable|max:1',
+        'notes' => 'nullable|max:1000',
+        ]);
+
+        $inventoryInstance = Inventory::where('id', $inventoryItem->id)->first();
+
+        $inventoryInstance->user_id = Auth::user()->id;
+        $inventoryInstance->purchase_price = $validatedData['purchase_price'];
+        $inventoryInstance->name = $validatedData['name'];
+        $inventoryInstance->sell_price = $validatedData['sell_price'];
+        $inventoryInstance->amount = $validatedData['amount'];
+        $inventoryInstance->taxes_paid = $validatedData['taxes_paid'];
+        $inventoryInstance->notes = $validatedData['notes'];
+        if(array_key_exists('delivery_group_select', $validatedData)){
+            $inventoryInstance->logistics_group_id = $validatedData['delivery_group_select'];
+        }else{
+            $inventoryInstance->logistics_group_id = null;
+        }
+
+        $inventoryInstance->save();
+        return redirect('/inventory');
     }
 
     /**
@@ -125,8 +167,10 @@ class InventoryController extends InventoryBaseController
      * @param  \App\Inventory  $inventory
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Inventory $inventory)
+    public function destroy(Inventory $inventoryItem)
     {
-        //
+        //dd($inventoryItem);
+        $inventoryItem->delete();
+        return redirect('/inventory');
     }
 }

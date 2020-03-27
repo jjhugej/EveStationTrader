@@ -16,21 +16,6 @@ use GuzzleHttp\Exception\ServerException;
 class MarketBaseController extends EveBaseController
 {
 
-    public function getSelectedCharacter(){
-
-        if(Auth::check()){
-            $user = Auth::user();
-
-            //check to make sure the user has a character selected before setting variables
-            if($user->current_selected_character_id !== null){
-                $currentSelectedCharacter = Character::where('character_id', $user->current_selected_character_id)->first();
-                return $currentSelectedCharacter;
-            }
-        }else{
-            return redirect('/login');
-        }
-    }
-
     public function getMarketOrders($character){    
 
         $client = new Client();

@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1 class="text-center">Logistics Overview</h1>
-    <a href="logistics/create"><button type="button" class="btn btn-primary">Create A Delivery</button></a>
+    <h1 class="text-center mb-5">Logistics Overview</h1>
+    <a href="logistics/create"><button type="button" class="btn btn-primary mb-1">+ Create A New Delivery Group</button></a>
     <div class="table-responsive border">
         <table class="table table-striped table-hover">
             <thead>
@@ -27,6 +27,7 @@
                         <td>{{$deliveryGroup->end_station}}</td>
                         <td class="fit">{{$deliveryGroup->created_at}}</td>
                         <td><a href="/logistics/{{$deliveryGroup->id}}/edit">edit</a></td>
+                        <td><a href="/logistics/{{$deliveryGroup->id}}/delete">delete</a></td>
                     </tr>
                 @endforeach
             </tbody>

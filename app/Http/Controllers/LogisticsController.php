@@ -143,8 +143,9 @@ class LogisticsController extends EveBaseController
      * @param  \App\Logistics  $logistics
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Logistics $logistics)
+    public function destroy(Logistics $deliveryGroup)
     {
-        //
+        $deliveryGroup->delete();
+        return redirect('/logistics');
     }
 }
