@@ -18,6 +18,11 @@ class MarketBaseController extends EveBaseController
 
     public function getMarketOrders($character){    
 
+        //eventually need to check when the last fetch was and determine whether another ESI call is warranted
+        $user = Auth::user();
+        $user->last_esi_market_fetch = Carbon::now();
+        $user->save();
+
         $client = new Client();
         try{
             $character_orders_url = "https://esi.evetech.net/latest" . "/characters/" . $character->character_id . "/orders/";

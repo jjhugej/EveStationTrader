@@ -16,7 +16,7 @@
             <tbody>
                 @foreach($marketOrders as $marketOrder)
                     <tr>
-                        <th class="fit" scope="row">{{ $marketOrder->typeName}}</th>
+                        <th class="fit" scope="row"> <a href="/marketorders/{{$marketOrder->order_id}}">{{ $marketOrder->typeName}}</a></th>
                         <td>@convertNumberToCurrency($marketOrder->price)</td>
                         <td>@formatNumber($marketOrder->volume_remain) {{'/'}} @formatNumber($marketOrder->volume_total)</td>
                         <td>N/A</td>

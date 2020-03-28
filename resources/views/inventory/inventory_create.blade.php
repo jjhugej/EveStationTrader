@@ -19,7 +19,12 @@
 
         <div class="form-group">
             <label for="name">Item Name:</label>
-            <input type="text" name="name" id="name" class="form-control {{$errors->has('name') ? 'border border-danger' : ''}}" value="{{ old('name') }}" placeholder="" required>
+            <input autocomplete="off" type="text" name="name" id="name" class="form-control {{$errors->has('name') ? 'border border-danger' : ''}}" value="{{ old('name') }}" placeholder="" required>
+        </div>
+        <div class="container">
+            <div id="js_item_search_results_target" class="card mb-3">
+                <!-- Item Search Results Field -->
+            </div>
         </div>
         <div class="form-row">
             <div class="col">
@@ -51,11 +56,11 @@
         </div>
         <div class="form-group">
             <h2 class="text-center">Link Item To Current Market Order</h2>
-            <a href="{{ config('baseUrl') }}/logistics/create"><button type="button" class="btn btn-primary">+ Create A Delivery Group</button></a>
         <div class="table-responsive border">
             <table class="table table-striped table-hover">
                 <thead>
                     <tr>
+                    <th scope="col">Select</th>
                     <th scope="col">Item</th>
                     <th scope="col">Price</th>
                     <th scope="col">Volume</th>
@@ -66,9 +71,12 @@
                 <tbody>
                     @foreach($marketOrders as $marketOrder)
                         <tr>
-                            <th class="fit" scope="row">{{ $marketOrder->typeName}}</th>
+                            <th  scope="row">
+                                <input type="checkbox" name="market_order_id_select" value="{{$marketOrder->order_id}}">
+                            </th>
+                            <td class="fit">{{ $marketOrder->typeName}}</td>
                             <td>@convertNumberToCurrency($marketOrder->price)</td>
-                            <td>@formatNumber($marketOrder->volume_remain) {{'/'}} @formatNumber($marketOrder->volume_total)</td>
+                            <td>@formatNumber($marketOrder->volume_remain) / @formatNumber($marketOrder->volume_total)</td>
                             <td>N/A</td>
                             <td>{{$marketOrder->locationName}}</td>
                         </tr>
@@ -116,5 +124,7 @@
 
         <input class="btn btn-success btn-lg btn-block" type="submit" value="Add Item"> 
     </form>
+
+    <script type="text/javascript" src="{{ asset('js/item_search.js') }}"></script>
 
 @endsection

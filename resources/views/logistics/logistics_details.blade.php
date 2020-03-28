@@ -39,7 +39,7 @@
                         <td>{{$itemInDeliveryGroup->purchase_price}}</td>
                         <td>{{$itemInDeliveryGroup->sell_price}}</td>
                         <td>{{$itemInDeliveryGroup->amount}}</td>
-                    <td><a href="{{ config('baseUrl') }}/inventory/{{$itemInDeliveryGroup->id}}/delete">Remove</a></td>
+                        <td><a href="{{ config('baseUrl') }}/inventory/{{$itemInDeliveryGroup->id}}/delete">Remove</a></td>
                     </tr>
                 @endforeach
             </tbody>

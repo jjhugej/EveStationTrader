@@ -20,6 +20,9 @@ class CreateUsersTable extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->bigInteger('current_selected_character_id')->nullable();
+            $table->dateTime('last_esi_market_fetch')->nullable();
+            $table->dateTime('last_esi_transactions_fetch')->nullable();
+            $table->dateTime('last_esi_inventory_fetch')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

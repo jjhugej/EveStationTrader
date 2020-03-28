@@ -115,6 +115,14 @@ table td span {
   width: 10%;
 }
 
+#js_item_search_results_target {
+  min-height: 30vh;
+}
+
+#searchResultContainer {
+  max-height: 30vh;
+}
+
 #contentSection {
   width: 100%;
   height: 100%;

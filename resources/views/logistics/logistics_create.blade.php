@@ -18,7 +18,7 @@
         @csrf
 
         <div class="form-group">
-            <label for="name">Name of delivery group:</label>
+            <label for="name">Name Of Delivery Group:</label>
         <input type="text" name="name" id="name" class="form-control {{$errors->has('name') ? 'border border-danger' : ''}}" value="{{ old('name') }}" placeholder="Delivery Group 1" required>
         </div>
         <div class="form-row">
@@ -32,7 +32,7 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="price">Price:</label>
+            <label for="price">Cost Of Delivery:</label>
             <input type="number" name="price" id="price" class="form-control {{$errors->has('price') ? 'border border-danger' : ''}}" value="{{ old('price') }}" placeholder="35,000,000">
         </div>
         <div class="form-group">

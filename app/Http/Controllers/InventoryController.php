@@ -74,7 +74,8 @@ class InventoryController extends InventoryBaseController
         'par' => 'integer|nullable',
         'amount' => 'integer|nullable',
         'taxes_paid' => 'integer|nullable',
-        'delivery_group_select' => 'nullable|max:1',
+        'delivery_group_select' => 'nullable',
+        'market_order_id_select' => 'nullable',
         'notes' => 'nullable|max:1000',
         ]);
 
@@ -90,6 +91,9 @@ class InventoryController extends InventoryBaseController
         if(array_key_exists('delivery_group_select', $validatedData)){
             $inventoryInstance->logistics_group_id = $validatedData['delivery_group_select'];
         }
+        if(array_key_exists('market_order_id_select', $validatedData)){
+            $inventoryInstance->market_order_id = $validatedData['market_order_id_select'];
+        }
 
         $inventoryInstance->save();
         return redirect('/inventory');
@@ -103,9 +107,19 @@ class InventoryController extends InventoryBaseController
      */
     public function show(Inventory $inventoryItem)
     {
+        
+        //check if the item has a market order attached to it
+        if($inventoryItem->market_order_id !== null){
+            $attachedMarketOrder = MarketOrders::where('order_id', $inventoryItem->market_order_id)->get();
+            $attachedMarketOrder=$this->resolveTypeIDToItemName($attachedMarketOrder)->first();
+        }
+        else{
+            $attachedMarketOrder = null;
+        }
+
         $item = $this->resolveSingleLogisticsGroupIDToName($inventoryItem);
-        //dd($item);
-        return view('inventory.inventory_details', compact('item'));
+        
+        return view('inventory.inventory_details', compact('item', 'attachedMarketOrder'));
     }
 
     /**
@@ -172,5 +186,16 @@ class InventoryController extends InventoryBaseController
         //dd($inventoryItem);
         $inventoryItem->delete();
         return redirect('/inventory');
+    }
+
+
+    //This method is used to return data from the eveitems table via the search method on the item_create view (specifically the item name input field).
+    public function itemSearch(Request $request){
+        //searchRequest is the variable that comes from the ajax get request
+        $searchRequest = $request->searchRequest;
+        if($searchRequest !== null){
+            $searchMatches = EveItem::where('typeName', 'LIKE','%'.$searchRequest.'%')->take(30)->get();
+            return view('inventory._item_search', compact('searchMatches'));
+        }
     }
 }

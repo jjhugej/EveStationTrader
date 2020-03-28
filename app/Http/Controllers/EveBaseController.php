@@ -245,7 +245,7 @@ class EveBaseController extends Controller
     
 
      public function resolveStationIDToName($character, $eveObjectDatas){
-        //THIS WILL RETURN THE OBJECT BACK WITH A PROPERTY OF "stationName" WHICH IS NOT PERSISTED ON THE "eveItem" TABLE
+        //THIS WILL RETURN THE OBJECT BACK WITH A PROPERTY OF "locationName" WHICH IS NOT PERSISTED ON THE "eveItem" TABLE
         //BUT WILL BE PERSISTED ON THE STRUCTURENAME TABLE IF IT HASN'T BEEN UPDATED IN 30 DAYS
 
         $locationIDArray = [];
