@@ -75,6 +75,7 @@ class InventoryController extends InventoryBaseController
         'amount' => 'integer|nullable',
         'taxes_paid' => 'integer|nullable',
         'delivery_group_select' => 'nullable',
+        'current_location' => 'nullable',
         'market_order_id_select' => 'nullable',
         'notes' => 'nullable|max:1000',
         ]);
@@ -88,6 +89,7 @@ class InventoryController extends InventoryBaseController
         $inventoryInstance->amount = $validatedData['amount'];
         $inventoryInstance->taxes_paid = $validatedData['taxes_paid'];
         $inventoryInstance->notes = $validatedData['notes'];
+        $inventoryInstance->current_location = $validatedData['current_location'];
         if(array_key_exists('delivery_group_select', $validatedData)){
             $inventoryInstance->logistics_group_id = $validatedData['delivery_group_select'];
         }
@@ -152,7 +154,9 @@ class InventoryController extends InventoryBaseController
         'par' => 'integer|nullable',
         'amount' => 'integer|nullable',
         'taxes_paid' => 'integer|nullable',
-        'delivery_group_select' => 'nullable|max:1',
+        'delivery_group_select' => 'nullable',
+        'current_location' => 'nullable',
+        'market_order_id_select' => 'nullable',
         'notes' => 'nullable|max:1000',
         ]);
 
@@ -164,11 +168,15 @@ class InventoryController extends InventoryBaseController
         $inventoryInstance->sell_price = $validatedData['sell_price'];
         $inventoryInstance->amount = $validatedData['amount'];
         $inventoryInstance->taxes_paid = $validatedData['taxes_paid'];
+        $inventoryInstance->current_location = $validatedData['current_location'];
         $inventoryInstance->notes = $validatedData['notes'];
         if(array_key_exists('delivery_group_select', $validatedData)){
             $inventoryInstance->logistics_group_id = $validatedData['delivery_group_select'];
         }else{
             $inventoryInstance->logistics_group_id = null;
+        }
+        if(array_key_exists('market_order_id_select', $validatedData)){
+            $inventoryInstance->market_order_id = $validatedData['market_order_id_select'];
         }
 
         $inventoryInstance->save();

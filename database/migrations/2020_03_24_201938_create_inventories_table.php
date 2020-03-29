@@ -23,8 +23,10 @@ class CreateInventoriesTable extends Migration
             $table->bigInteger('purchase_price')->nullable();
             $table->bigInteger('sell_price')->nullable();
             $table->bigInteger('amount')->nullable();
+            $table->bigInteger('par')->nullable();
             $table->bigInteger('volume_per_item')->nullable();
             $table->bigInteger('taxes_paid')->nullable();
+            $table->string('current_location')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
         });

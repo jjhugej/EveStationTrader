@@ -17,7 +17,7 @@
         
         @csrf
 
-        <div class="form-group">
+        <div class="form-group mb-0">
             <label for="name">Item Name:</label>
             <input autocomplete="off" type="text" name="name" id="name" class="form-control {{$errors->has('name') ? 'border border-danger' : ''}}" value="{{ old('name') }}" placeholder="" required>
         </div>
@@ -51,6 +51,10 @@
             </div>
         </div>
         <div class="form-group">
+                <label for="current_location">Current Location:</label>
+                <input type="text" name="current_location" id="current_location" class="form-control {{$errors->has('current_location') ? 'border border-danger' : ''}}" value="{{ old('current_location') }}" placeholder="">
+            </div>
+        <div class="form-group">
             <label for="notes">Notes:</label>
             <textarea  id="notes" name="notes" class="form-control {{$errors->has('notes') ? 'border border-danger' : ''}}" rows="3">{{ old('notes') }}</textarea>
         </div>
@@ -68,11 +72,12 @@
                     <th scope="col">Location</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="js-market-order-target">
                     @foreach($marketOrders as $marketOrder)
                         <tr>
                             <th  scope="row">
-                                <input type="checkbox" name="market_order_id_select" value="{{$marketOrder->order_id}}">
+                                <input class="market-order-id-select" type="radio" name="market_order_id_select" 
+                                value="{{$marketOrder->order_id}},{{ $marketOrder->typeName}},{{$marketOrder->price}},{{$marketOrder->volume_remain}},{{$marketOrder->volume_total}},{{$marketOrder->locationName}}">
                             </th>
                             <td class="fit">{{ $marketOrder->typeName}}</td>
                             <td>@convertNumberToCurrency($marketOrder->price)</td>
