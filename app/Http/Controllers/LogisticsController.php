@@ -26,7 +26,7 @@ class LogisticsController extends EveBaseController
     public function index()
     {
         $deliveryGroups = Logistics::where('user_id', Auth::user()->id)->orderBy('created_at','desc')->get();
-        //dd($logisticsData);
+        
         return view('logistics.logistics', compact('deliveryGroups'));
     }
 
@@ -58,10 +58,13 @@ class LogisticsController extends EveBaseController
         'status' => 'required',
         'notes' => 'nullable|max:1000',
     ]);
+
+        $selectedCharacter = Character::where('user_id', Auth::user()->id)->where('is_selected_character', 1)->first();
             
         $logisticsInstance = new Logistics();
 
         $logisticsInstance->user_id = Auth::user()->id;
+        $logisticsInstance->character_id = $selectedCharacter->character_id;
         $logisticsInstance->name = $validatedData['name'];
         $logisticsInstance->start_station = $validatedData['start_station'];
         $logisticsInstance->end_station = $validatedData['end_station'];
@@ -85,11 +88,16 @@ class LogisticsController extends EveBaseController
      */
     public function show(Logistics $deliveryGroup)
     {
-        $itemsInDeliveryGroup = Inventory::where('logistics_group_id', $deliveryGroup->id)->get();
+        $itemsInDeliveryGroup = Inventory::where('user_id', Auth::user()->id)
+                                        ->where('logistics_group_id', $deliveryGroup->id)
+                                        ->get();
 
-        //dd($itemsInDeliveryGroup);
+        
+        $itemsNotInDeliveryGroup = Inventory::where('user_id', Auth::user()->id)
+                                            ->where('logistics_group_id', '=', null)
+                                            ->get();
 
-        return view('logistics.logistics_details', compact('deliveryGroup', 'itemsInDeliveryGroup'));
+        return view('logistics.logistics_details', compact('deliveryGroup', 'itemsInDeliveryGroup', 'itemsNotInDeliveryGroup'));
     }
 
     /**

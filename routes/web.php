@@ -54,4 +54,7 @@ Route::get('/inventory/{inventoryItem}', 'InventoryController@show')->middleware
 Route::get('/inventory/show/{inventoryItem}', 'InventoryController@show')->middleware('auth');
 Route::get('/inventory/{inventoryItem}/edit', 'InventoryController@edit')->middleware('auth');
 Route::put('/inventory/{inventoryItem}/edit', 'InventoryController@update')->middleware('auth');
+Route::get('/inventory/{inventoryItem}/remove', 'InventoryController@remove')->middleware('auth');
+Route::get('/inventory/{inventoryItemID}/add/{logisticsGroupID}', 'InventoryController@add')->middleware('auth');
 Route::get('/inventory/{inventoryItem}/delete', 'InventoryController@destroy')->middleware('auth');
+//Route::post('/inventory/{inventoryItem}/{logisticsGroupID}', 'InventoryController@addLogisticsGroupID')->middleware('auth');

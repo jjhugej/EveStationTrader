@@ -37,7 +37,7 @@ class InventoryController extends InventoryBaseController
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
         //send delivery groups to view so users can link the item to a delivery group
         $deliveryGroups = Logistics::where('user_id', Auth::user()->id)->orderBy('created_at','desc')->get();
@@ -79,13 +79,16 @@ class InventoryController extends InventoryBaseController
         'market_order_id_select' => 'nullable',
         'notes' => 'nullable|max:1000',
         ]);
+        $selectedCharacter = Character::where('user_id', Auth::user()->id)->where('is_selected_character', 1)->first();
 
         $inventoryInstance = new Inventory();
 
         $inventoryInstance->user_id = Auth::user()->id;
+        $inventoryInstance->character_id = $selectedCharacter->character_id;
         $inventoryInstance->purchase_price = $validatedData['purchase_price'];
         $inventoryInstance->name = $validatedData['name'];
         $inventoryInstance->sell_price = $validatedData['sell_price'];
+        $inventoryInstance->par = $validatedData['par'];
         $inventoryInstance->amount = $validatedData['amount'];
         $inventoryInstance->taxes_paid = $validatedData['taxes_paid'];
         $inventoryInstance->notes = $validatedData['notes'];
@@ -94,7 +97,11 @@ class InventoryController extends InventoryBaseController
             $inventoryInstance->logistics_group_id = $validatedData['delivery_group_select'];
         }
         if(array_key_exists('market_order_id_select', $validatedData)){
-            $inventoryInstance->market_order_id = $validatedData['market_order_id_select'];
+            /*
+            because we store the value of every property within the value field of market_order_id_select,
+            we need to split the string into an array (delimited by a comma) and take the 0th value (which is the actual market order id)
+            */
+            $inventoryInstance->market_order_id = explode(',',$validatedData['market_order_id_select'])[0];
         }
 
         $inventoryInstance->save();
@@ -166,6 +173,7 @@ class InventoryController extends InventoryBaseController
         $inventoryInstance->purchase_price = $validatedData['purchase_price'];
         $inventoryInstance->name = $validatedData['name'];
         $inventoryInstance->sell_price = $validatedData['sell_price'];
+        $inventoryInstance->par = $validatedData['par'];
         $inventoryInstance->amount = $validatedData['amount'];
         $inventoryInstance->taxes_paid = $validatedData['taxes_paid'];
         $inventoryInstance->current_location = $validatedData['current_location'];
@@ -176,7 +184,11 @@ class InventoryController extends InventoryBaseController
             $inventoryInstance->logistics_group_id = null;
         }
         if(array_key_exists('market_order_id_select', $validatedData)){
-            $inventoryInstance->market_order_id = $validatedData['market_order_id_select'];
+            /*
+            because we store the value of every property within the value field of market_order_id_select,
+            we need to split the string into an array (delimited by a comma) and take the 0th value (which is the actual market order id)
+            */
+            $inventoryInstance->market_order_id = explode(',',$validatedData['market_order_id_select'])[0];
         }
 
         $inventoryInstance->save();
@@ -195,10 +207,28 @@ class InventoryController extends InventoryBaseController
         $inventoryItem->delete();
         return redirect('/inventory');
     }
+    public function remove($inventoryItem){
+        //this method removes an item from an assigned logistics group
+        $inventoryItemObject = Inventory::where('id', $inventoryItem)->first();
+        $inventoryItemObject->logistics_group_id = null;
+        $inventoryItemObject->save();
 
+        return redirect()->back();
 
-    //This method is used to return data from the eveitems table via the search method on the item_create view (specifically the item name input field).
+    }
+
+    public function add($inventoryItemID, $logisticsGroupID){
+        //this method adds an item to a logistics group
+        $inventoryItemObject = Inventory::where('id',$inventoryItemID)->first();
+        $inventoryItemObject->logistics_group_id = $logisticsGroupID;
+        
+        $inventoryItemObject->save();
+
+        return redirect()->back();
+    }
+
     public function itemSearch(Request $request){
+        //This method is used to return data from the eveitems table via the search method on the item_create view (specifically the item name input field).
         //searchRequest is the variable that comes from the ajax get request
         $searchRequest = $request->searchRequest;
         if($searchRequest !== null){
@@ -206,4 +236,5 @@ class InventoryController extends InventoryBaseController
             return view('inventory._item_search', compact('searchMatches'));
         }
     }
+
 }

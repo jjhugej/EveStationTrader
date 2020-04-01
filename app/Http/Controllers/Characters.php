@@ -22,7 +22,6 @@ class Characters extends EveBaseController
     {
         // this method returns all the characters attached to the authenticated user
         $characters = auth()->user()->characters()->get();
-        
         return view('characters', compact('characters'));
     }
 
@@ -45,6 +44,7 @@ class Characters extends EveBaseController
 
     public function store(Request $request)
     {
+       
         //this endpoint is used to select and save a character
 
         /*

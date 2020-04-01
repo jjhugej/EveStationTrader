@@ -21,6 +21,7 @@
         <p>Purchase Price: @formatNumber($item->purchase_price)</p>
         <p>Sell Price: @formatNumber($item->sell_price)</p>
         <p>Amount: @formatNumber($item->amount)</p>
+        <p>Current Location: {{$item->current_location}}</p>
         <p>Notes: {{$item->notes}}</p>
         <p>Created At: {{$item->created_at}}</p>
         <p>Updated At: {{$item->updated_at}}</p>

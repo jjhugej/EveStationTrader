@@ -9,8 +9,8 @@
                 <th scope="col">Item</th>
                 <th scope="col">Price</th>
                 <th scope="col">Volume</th>
-                <th scope="col">Par</th>
                 <th scope="col">Location</th>
+                <th scope="col">Character</th>
                 </tr>
             </thead>
             <tbody>
@@ -19,8 +19,8 @@
                         <th class="fit" scope="row"> <a href="/marketorders/{{$marketOrder->order_id}}">{{ $marketOrder->typeName}}</a></th>
                         <td>@convertNumberToCurrency($marketOrder->price)</td>
                         <td>@formatNumber($marketOrder->volume_remain) {{'/'}} @formatNumber($marketOrder->volume_total)</td>
-                        <td>N/A</td>
                         <td>{{$marketOrder->locationName}}</td>
+                        <td>{{$marketOrder->character_name}}</td>
                     </tr>
                 @endforeach
             </tbody>

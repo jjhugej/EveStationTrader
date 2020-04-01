@@ -14,6 +14,7 @@
                     <th scope="col">Par</th>
                     <th scope="col">Taxes Paid</th>
                     <th scope="col">Delivery Group</th>
+                    <th scope="col">Current Location</th>
                     <th scope="col">On Market?</th>
                     <th scope="col">Created At</th>
                 </tr>
@@ -22,12 +23,13 @@
                 @foreach($items as $item)
                     <tr>
                     <th class="fit" scope="row"><a href="{{ config('baseUrl') }}/inventory/{{$item->id}}">{{$item->name}}</a></th>
-                        <td>{{$item->purchase_price}}</td>
-                        <td>{{$item->sell_price}}</td>
-                        <td>{{$item->amount}}</td>
-                        <td>{{$item->par}}</td>
-                        <td>{{$item->taxes_paid}}</td>
-                    <td><a href="{{config('baseUrl')}}/logistics/{{$item->logistics_group_id}}">{{$item->logistics_group_name}}</a></td>
+                        <td>@formatNumber($item->purchase_price)</td>
+                        <td>@formatNumber($item->sell_price)</td>
+                        <td>@formatNumber($item->amount)</td>
+                        <td>@formatNumber($item->par)</td>
+                        <td>@formatNumber($item->taxes_paid)</td>
+                        <td><a href="{{config('baseUrl')}}/logistics/{{$item->logistics_group_id}}">{{$item->logistics_group_name}}</a></td>
+                        <td>{{$item->current_location}}</td>
                         <td><a href="#">no</a></td>
                         <td>{{$item->created_at}}</td>
                         <td> <a href="{{ config('baseUrl') }}/inventory/{{$item->id}}/edit">edit</a></td>

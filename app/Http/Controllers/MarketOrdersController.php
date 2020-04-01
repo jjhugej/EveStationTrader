@@ -33,12 +33,14 @@ class MarketOrdersController extends MarketBaseController
             $currentSelectedCharacter = $this->checkTokens($currentSelectedCharacter);
      
             $marketOrders = $this->getMarketOrders($currentSelectedCharacter);
-
-            $this->saveMarketOrdersToDB($marketOrders);
+            
+            $marketOrders = $this->saveMarketOrdersToDB($marketOrders);
 
             $marketOrders = $this->resolveTypeIDToItemName($marketOrders);
 
             $marketOrders = $this->resolveStationIDToName($currentSelectedCharacter, $marketOrders);
+
+            //$marketOrders = $this->resolveMultipleCharacterNamesFromIDs($marketOrders);
 
             return view('market.marketOrders', compact('marketOrders'));
         }

@@ -16,6 +16,7 @@ class CreateLogisticsTable extends Migration
         Schema::create('logistics', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('user_id');
+            $table->bigInteger('character_id');
             $table->string('name');
             $table->string('start_station')->nullable();
             $table->string('end_station')->nullable();

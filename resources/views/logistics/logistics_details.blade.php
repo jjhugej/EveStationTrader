@@ -20,8 +20,8 @@
 
     <h1 class="mb-3">Items In This Group:</h1>
 
-    <a href="{{ config('baseUrl') }}/inventory/create"><button class="btn btn-primary mb-1">Add Item To Group</button></a>
-    <div class="table-responsive border">
+    <a href="{{ config('baseUrl') }}/inventory/create"><button class="btn btn-primary mb-1">Create New Item</button></a>
+    <div class="table-responsive border mb-3">
         <table class="table table-striped table-hover">
             <thead>
                 <tr>
@@ -35,13 +35,38 @@
             <tbody>
                 @foreach($itemsInDeliveryGroup as $itemInDeliveryGroup)
                     <tr>
-                        <th class="fit" scope="row">{{$itemInDeliveryGroup->name}}</th>
+                        <th class="fit" scope="row"> <a href="{{ config('baseUrl') }}/inventory/{{$itemInDeliveryGroup->id}}">{{$itemInDeliveryGroup->name}}</a></th>
                         <td>{{$itemInDeliveryGroup->purchase_price}}</td>
                         <td>{{$itemInDeliveryGroup->sell_price}}</td>
                         <td>{{$itemInDeliveryGroup->amount}}</td>
-                        <td><a href="{{ config('baseUrl') }}/inventory/{{$itemInDeliveryGroup->id}}/delete">Remove</a></td>
+                    <td><a href="{{ config('baseUrl') }}/inventory/{{$itemInDeliveryGroup->id}}/remove">Remove</a></td>
                     </tr>
                 @endforeach
+            </tbody>
+        </table>
+    </div>
+    <h1>Add Existing Inventory Item To This Group</h1>
+    <div class="table-responsive border">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                <th scope="col">Item</th>
+                <th scope="col">Purchase Price</th>
+                <th scope="col">Sell Price</th>
+                <th scope="col">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($itemsNotInDeliveryGroup as $itemNotInDeliveryGroup)
+                        <tr>
+                            <th class="fit" scope="row"> <a href="{{ config('baseUrl') }}/inventory/{{$itemNotInDeliveryGroup->id}}">{{$itemNotInDeliveryGroup->name}}</a></th>
+                            <td>{{$itemNotInDeliveryGroup->purchase_price}}</td>
+                            <td>{{$itemNotInDeliveryGroup->sell_price}}</td>
+                            <td>{{$itemNotInDeliveryGroup->amount}}</td>
+                            <td><a class="btn btn-primary" href="{{ config('baseUrl') }}/inventory/{{$itemNotInDeliveryGroup->id}}/add/{{$deliveryGroup->id}}">add</a></td>
+                        </tr>
+                    </form>
+                    @endforeach
             </tbody>
         </table>
     </div>

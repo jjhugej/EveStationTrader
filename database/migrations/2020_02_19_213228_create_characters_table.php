@@ -25,7 +25,10 @@ class CreateCharactersTable extends Migration
             $table->longText('refresh_token')->nullable();
             $table->boolean('is_selected_character')->default(false);
             $table->dateTime('expires')->nullable();
-            $table->dateTime('last_fetch')->nullable();
+            $table->dateTime('last_esi_token_fetch')->nullable();
+            $table->dateTime('next_available_esi_market_fetch')->nullable();
+            $table->dateTime('next_available_esi_transactions_fetch')->nullable();
+            $table->dateTime('next_available_esi_inventory_fetch')->nullable();
             $table->timestamps();
         });
     }

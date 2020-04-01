@@ -46,6 +46,10 @@
             </div>
         </div>
         <div class="form-group">
+                <label for="current_location">Current Location:</label>
+                <input type="text" name="current_location" id="current_location" class="form-control {{$errors->has('current_location') ? 'border border-danger' : ''}}" value="{{ $inventoryItem->current_location }}" placeholder="">
+            </div>
+        <div class="form-group">
             <label for="notes">Notes:</label>
             <textarea  id="notes" name="notes" class="form-control {{$errors->has('notes') ? 'border border-danger' : ''}}" rows="3">{{ $inventoryItem->notes }}</textarea>
         </div>

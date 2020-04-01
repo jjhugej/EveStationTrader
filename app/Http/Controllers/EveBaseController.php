@@ -114,7 +114,7 @@ class EveBaseController extends Controller
                 // set new tokens
                 $character->access_token = $tokens->access_token;
                 $character->refresh_token = $tokens->refresh_token;
-                $character->last_fetch = Carbon::now();
+                $character->last_esi_token_fetch = Carbon::now();
                 $character->expires = Carbon::now()->addMinutes(20);
                 $character->save();
                 return $character;
@@ -173,7 +173,7 @@ class EveBaseController extends Controller
                 $characterModel->user_id = Auth::user()->id;
                 $characterModel->character_id = $characterCredentials->CharacterID;
                 $characterModel->character_name = $characterCredentials->CharacterName;
-                $characterModel->last_fetch = Carbon::now();
+                $characterModel->last_esi_token_fetch = Carbon::now();
                 $characterModel->expires = $characterCredentials->ExpiresOn;
                 $characterModel->access_token = $tokens->access_token;
                 $characterModel->refresh_token = $tokens->refresh_token;
@@ -198,16 +198,17 @@ class EveBaseController extends Controller
 
     public function updateTokenExpiration($character_id){
         $characterModel = Character::where('character_id', $character_id)->firstOrFail();
-        $characterModel->last_fetch = Carbon::now();
+        $characterModel->last_esi_token_fetch = Carbon::now();
         $characterModel->expires = Carbon::now()->addMinutes(20);
         $characterModel->save();
     }
 
     public function saveNewTokensToDB($character_id, $newTokens){
                 $characterModel = Character::where('character_id', $character_id)->get();
+                dd($characterModel);
                 $characterModel[0]->access_token = $newTokens->access_token;
                 $characterModel[0]->refresh_token = $newTokens->refresh_token;
-                $characterModel[0]->last_fetch = Carbon::now();
+                $characterModel[0]->last_esi_token_fetch = Carbon::now();
                 $characterModel[0]->expires = Carbon::now()->addMinutes(20);
                 $characterModel[0]->save();
                 return true;
@@ -222,6 +223,7 @@ class EveBaseController extends Controller
             $pattern = '/[a-zA-Z]+/';
             $replacement = ' ';
             $convertedTime = trim(preg_replace($pattern, $replacement, $dateTime));
+    
             return $convertedTime;
         }
 
@@ -361,6 +363,22 @@ class EveBaseController extends Controller
         }else{
             return redirect('/login');
         }
+    }
+
+    public function resolveSingleCharacterNameFromID($character_id){
+        $character = Character::where('character_id', $character_id)->first();
+
+        return $character->character_name;
+    }
+    public function resolveMultipleCharacterNamesFromIDs($objects){
+        //dd($objects);
+        foreach($objects as $object){
+
+            $character = Character::where('character_id', $object->character_id)->first();
+
+            $object->character_name = $character->character_name;
+        }
+        return $objects;
     }
 
     

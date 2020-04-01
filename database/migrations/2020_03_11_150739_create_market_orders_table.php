@@ -15,12 +15,14 @@ class CreateMarketOrdersTable extends Migration
     {
         Schema::create('market_orders', function (Blueprint $table) {
             $table->bigInteger('order_id')->unique();
-            $table->bigInteger('user_id')->unsigned();
-            $table->bigInteger('inventory_id')->nullable();
+            $table->bigInteger('user_id');
+            //$table->foreign('user_id')->references('id')->on('users');
+            $table->bigInteger('character_id'); 
+            $table->bigInteger('inventory_id')->nullable();  
             $table->bigInteger('logistics_group_id')->nullable();
             $table->integer('duration');
             $table->boolean('is_corporation');
-            $table->dateTime('issued');
+            $table->dateTime('issued')->nullable();
             $table->bigInteger('location_id');
             $table->bigInteger('price');
             $table->string('range');
