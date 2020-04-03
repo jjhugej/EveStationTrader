@@ -2,9 +2,9 @@
 
 @section('content')
     <h1 class="text-center mb-5">Logistics Overview</h1>
-    <a href="logistics/create"><button type="button" class="btn btn-primary mb-1">+ Create A New Delivery Group</button></a>
+    <a href="logistics/create"><button type="button" class="btn btn-primary mb-2">+ Create A New Delivery Group</button></a>
     <div class="table-responsive border">
-        <table class="table table-striped table-hover">
+        <table id="logisticsGroupTable" class="table table-striped table-hover">
             <thead>
                 <tr>
                     <th scope="col">Group Name</th>

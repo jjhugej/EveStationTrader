@@ -115,6 +115,20 @@ table td span {
   width: 10%;
 }
 
+#deliveryGroupTable {
+  max-height: 40vh;
+  display: block;
+}
+
+#marketOrderGroupTable {
+  max-height: 40vh;
+  display: block;
+}
+
+#logisticsGroupTable {
+  display: block;
+}
+
 #searchResultContainer {
   max-height: 22vh;
 }

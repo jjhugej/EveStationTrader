@@ -33,7 +33,6 @@ Route::get('/selectcharacter/{character_id}', 'Characters@store')->middleware('a
 Route::get('/marketorders', 'MarketOrdersController@index')->middleware('auth');
 Route::get('/marketorders/{marketOrder}', 'MarketOrdersController@show')->middleware('auth');
 
-
 //Logistics
 Route::get('/logistics', 'LogisticsController@index')->middleware('auth');
 Route::get('/logistics/create', 'LogisticsController@create')->middleware('auth');
@@ -43,9 +42,9 @@ Route::get('/logistics/{deliveryGroup}/edit', 'LogisticsController@edit')->middl
 Route::put('/logistics/{deliveryGroup}/edit', 'LogisticsController@update')->middleware('auth');
 Route::get('/logistics/{deliveryGroup}/delete', 'LogisticsController@destroy')->middleware('auth');
 
-
 //Inventory Server Partials
 Route::get('inventory/itemsearch', 'InventoryController@itemSearch');
+
 //Inventory
 Route::get('/inventory', 'InventoryController@index')->middleware('auth');
 Route::get('/inventory/create', 'InventoryController@create')->middleware('auth');
@@ -57,4 +56,9 @@ Route::put('/inventory/{inventoryItem}/edit', 'InventoryController@update')->mid
 Route::get('/inventory/{inventoryItem}/remove', 'InventoryController@remove')->middleware('auth');
 Route::get('/inventory/{inventoryItemID}/add/{logisticsGroupID}', 'InventoryController@add')->middleware('auth');
 Route::get('/inventory/{inventoryItem}/delete', 'InventoryController@destroy')->middleware('auth');
-//Route::post('/inventory/{inventoryItem}/{logisticsGroupID}', 'InventoryController@addLogisticsGroupID')->middleware('auth');
+
+//Shopping List
+Route::get('/shoppinglist', 'ShoppingListController@index')->middleware('auth');
+Route::get('/shoppinglist/create', 'ShoppingListController@create')->middleware('auth');
+Route::post('/shoppinglist/create', 'ShoppingListController@store')->middleware('auth');
+Route::get('/shoppinglist/{shoppingList}', 'ShoppingListController@show')->middleware('auth');

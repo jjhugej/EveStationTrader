@@ -28,6 +28,7 @@ class InventoryController extends InventoryBaseController
     {
         $inventoryItems = Inventory::where('user_id', Auth::user()->id)->get();
         $items = $this->resolveMultipleLogisticsGroupIDToName($inventoryItems);
+        $items = $this->resolveMultipleCharacterNamesFromIDs($items);
         
         return view('inventory.inventory', compact('items'));
     }
@@ -44,10 +45,14 @@ class InventoryController extends InventoryBaseController
 
         //retrieve market orders of user's selected character and resolve the item name and station name
         $currentSelectedCharacter = $this->getSelectedCharacter();
+            
         if($currentSelectedCharacter !== null && $currentSelectedCharacter->is_selected_character === 1){
-            $marketOrders = MarketOrders::where('user_id', Auth::user()->id)->orderBy('created_at','desc')->get();
+            
+            $marketOrders = MarketOrders::where('user_id', Auth::user()->id)->get();
             $marketOrders = $this->resolveTypeIDToItemName($marketOrders);
             $marketOrders = $this->resolveStationIDToName($currentSelectedCharacter, $marketOrders);
+            $marketOrders = $this->resolveMultipleCharacterNamesFromIDs($marketOrders);
+            $marketOrders = $marketOrders->sortBy('typeName');
 
         return view('inventory.inventory_create', compact('deliveryGroups', 'marketOrders'));
         }else{
@@ -66,7 +71,6 @@ class InventoryController extends InventoryBaseController
      */
     public function store(Request $request)
     {
-        //dd($request->all());
         $validatedData = $request->validate([
         'name' => 'required|max:255',
         'purchase_price' => 'required|max:255',
@@ -127,6 +131,9 @@ class InventoryController extends InventoryBaseController
         }
 
         $item = $this->resolveSingleLogisticsGroupIDToName($inventoryItem);
+        $item->character_name = $this->resolveSingleCharacterNameFromID($inventoryItem);
+
+        //dd($item);
         
         return view('inventory.inventory_details', compact('item', 'attachedMarketOrder'));
     }
@@ -139,10 +146,29 @@ class InventoryController extends InventoryBaseController
      */
     public function edit(Inventory $inventoryItem)
     {
-        //dd($inventoryItem->id);
+        //dd($inventoryItem);
         $deliveryGroups = Logistics::where('user_id', Auth::user()->id)->orderBy('created_at','desc')->get();
+        
+        $currentSelectedCharacter = $this->getSelectedCharacter();
+            
+        if($currentSelectedCharacter !== null && $currentSelectedCharacter->is_selected_character === 1){
+            
+            $marketOrders = MarketOrders::where('user_id', Auth::user()->id)->get();
+            $marketOrders = $this->resolveTypeIDToItemName($marketOrders);
+            $marketOrders = $this->resolveStationIDToName($currentSelectedCharacter, $marketOrders);
+            $marketOrders = $this->resolveMultipleCharacterNamesFromIDs($marketOrders);
+            $marketOrders = $marketOrders->sortBy('typeName');
 
-        return view('inventory.inventory_edit', compact('inventoryItem','deliveryGroups')); 
+        return view('inventory.inventory_edit', compact('inventoryItem','deliveryGroups', 'marketOrders')); 
+
+        }else{
+            //redirect to characters because none are selected and flash an error message
+            $request->session()->flash('error', 'You Must Select A Character Before Proceeding');
+
+            return redirect('/characters');
+        }
+
+        
     }
 
     /**
@@ -154,6 +180,7 @@ class InventoryController extends InventoryBaseController
      */
     public function update(Request $request, Inventory $inventoryItem)
     {
+        
         $validatedData = $request->validate([
         'name' => 'required|max:255',
         'purchase_price' => 'required|max:255',

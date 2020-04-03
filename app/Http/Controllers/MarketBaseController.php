@@ -16,7 +16,7 @@ use GuzzleHttp\Exception\ServerException;
 class MarketBaseController extends EveBaseController
 {
 
-    public function getMarketOrders($character){    
+    public function getMarketOrdersForSelectedCharacter($character){    
 
         //TODO: Differentiate between orders for each character and ALL market orders...
 
@@ -26,18 +26,17 @@ class MarketBaseController extends EveBaseController
         
         //check if the selected character has made an ESI call within the last 10 minutes (or whatever $selectedCharacter->next_available_esi_market_fetch is set to when orders are retrieved from esi)
         if($selectedCharacter->next_available_esi_market_fetch !== null && 
-            $selectedCharacter->next_available_esi_market_fetch < Carbon::now()->toDateTimeString()){
+            $selectedCharacter->next_available_esi_market_fetch > Carbon::now()->toDateTimeString()){
 
                 //if true selected character has made an ESI call too recently, and its saved market orders will be returned instead of making another ESI call
-                
-                $data = MarketOrders::where('user_id', Auth::user()->id)->where('current_selected_character', 1)->get();   
-
+    
+                $data = MarketOrders::where('user_id', Auth::user()->id)->where('character_id', $selectedCharacter->character_id)->get();   
+               
                 $data->character_name = $this->resolveMultipleCharacterNamesFromIDs($data);
-                dd($data);
+               
                 return($data);
             }
             else{
-                
                 //else the character may make another ESI call since enough time has passed
                 $client = new Client();
                 try{
@@ -53,12 +52,14 @@ class MarketBaseController extends EveBaseController
                     $data = json_decode($resp->getBody());
                     
                     //update the last market fetch for the selected character
-                    /*
+                    
+                    
                     $selectedCharacter = Character::where('user_id', Auth::user()->id)->where('is_selected_character', 1)->first();
                     $selectedCharacter->next_available_esi_market_fetch = Carbon::now()->addminutes(2)->toDateTimeString(); 
+        
             
                     $selectedCharacter->save();
-                    */
+                    
 
                     return($data);
                 }   
@@ -69,6 +70,7 @@ class MarketBaseController extends EveBaseController
     }
 
     public function saveMarketOrdersToDB($marketOrders){
+       
         
         $marketOrderArray = [];
 
@@ -96,8 +98,8 @@ class MarketBaseController extends EveBaseController
                 $marketOrderInstance->volume_total = $marketOrder->volume_total;
                 
                 $marketOrderInstance->save(); 
-
-                $marketOrderInstance->character_name = $this->resolveSingleCharacterNameFromID($currentSelectedCharacter->character_id);
+                $marketOrderInstance->character_name = $this->resolveSingleCharacterNameFromID($currentSelectedCharacter);
+                
                 
                 array_push($marketOrderArray, $marketOrderInstance);
                
@@ -123,13 +125,13 @@ class MarketBaseController extends EveBaseController
                 $marketOrderInstance->volume_total = $marketOrder->volume_total;
 
                 $marketOrderInstance->save();
-
-                $marketOrderInstance->character_name = $this->resolveSingleCharacterNameFromID($currentSelectedCharacter->character_id);
+                $marketOrderInstance = $this->resolveSingleCharacterNameFromID($currentSelectedCharacter);
             
                 array_push($marketOrderArray, $marketOrderInstance);
             }
         }  
-        //dd($marketOrderArray,'saving marketorders to db', $marketOrders);
+        
+        //dd($marketOrderArray);
         return $marketOrderArray;
     }
 

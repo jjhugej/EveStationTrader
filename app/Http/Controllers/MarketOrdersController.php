@@ -32,15 +32,13 @@ class MarketOrdersController extends MarketBaseController
 
             $currentSelectedCharacter = $this->checkTokens($currentSelectedCharacter);
      
-            $marketOrders = $this->getMarketOrders($currentSelectedCharacter);
+            $marketOrders = $this->getMarketOrdersForSelectedCharacter($currentSelectedCharacter);
             
             $marketOrders = $this->saveMarketOrdersToDB($marketOrders);
 
             $marketOrders = $this->resolveTypeIDToItemName($marketOrders);
 
             $marketOrders = $this->resolveStationIDToName($currentSelectedCharacter, $marketOrders);
-
-            //$marketOrders = $this->resolveMultipleCharacterNamesFromIDs($marketOrders);
 
             return view('market.marketOrders', compact('marketOrders'));
         }
@@ -88,6 +86,8 @@ class MarketOrdersController extends MarketBaseController
             //in order to run our resolutions we must convert the single object into an eloquent collection refer to eveBaseController->foreach portion
             $marketOrder = $this->resolveTypeIDToItemName(MarketOrders::where('order_id', $marketOrder->order_id)->get());
             $marketOrder = $this->resolveStationIDToName($currentSelectedCharacter, $marketOrder)->first();
+            $marketOrder->character_name = $this->resolveSingleCharacterNameFromID($marketOrder);
+            
             return view('market.marketOrders_details', compact('marketOrder'));
         }else{
             //redirect to characters because none are selected and flash an error message

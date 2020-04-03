@@ -127,11 +127,12 @@ class EveBaseController extends Controller
 
     public function checkTokens($character){
         //this method checks the tokens of a character and updates them if they are expired
-
+        
         $tokenExpired = $this->checkTokenExpiration ($character->character_id);
-         
+        
         if($tokenExpired === true){
-           $newTokens =  $this->getNewAccessTokenWithRefreshToken();
+            $newTokens =  $this->getNewAccessTokenWithRefreshToken();
+
             return $newTokens;
         }
         return $character;
@@ -177,6 +178,7 @@ class EveBaseController extends Controller
                 $characterModel->expires = $characterCredentials->ExpiresOn;
                 $characterModel->access_token = $tokens->access_token;
                 $characterModel->refresh_token = $tokens->refresh_token;
+
                 $characterModel->save();
             }
             else{
@@ -189,8 +191,8 @@ class EveBaseController extends Controller
                 $characterModel->expires = $characterCredentials->ExpiresOn;
                 $characterModel->access_token = $tokens->access_token;
                 $characterModel->refresh_token = $tokens->refresh_token;
+
                 $characterModel->save();
-                //dd($characterModel->character_name, $characterCredentials->CharacterName);
             }             
         }
 
@@ -249,7 +251,7 @@ class EveBaseController extends Controller
      public function resolveStationIDToName($character, $eveObjectDatas){
         //THIS WILL RETURN THE OBJECT BACK WITH A PROPERTY OF "locationName" WHICH IS NOT PERSISTED ON THE "eveItem" TABLE
         //BUT WILL BE PERSISTED ON THE STRUCTURENAME TABLE IF IT HASN'T BEEN UPDATED IN 30 DAYS
-
+     
         $locationIDArray = [];
         $locationNameArray = [];
 
@@ -272,6 +274,7 @@ class EveBaseController extends Controller
                 array_push($locationNameArray, $locationIDInstance->location_name); 
 
             }else{
+                //dd($locationIDArray, 'location id');
         
                 //if locationIdArray[i] is <100,000,000 it is not a structure, it is a station
                 if($locationID > 100000000){
@@ -310,6 +313,7 @@ class EveBaseController extends Controller
                     $client = new Client();
                     try{
                         $station_url = "https://esi.evetech.net/latest" . "/universe/stations/" . $locationID;
+                        
                         $auth_headers = [
                             'headers' => [
                                 'Authorization' => 'Bearer ' . $character->access_token,
@@ -317,8 +321,10 @@ class EveBaseController extends Controller
                                 'Content-Type' => 'application/x-www-form-urlencoded',
                             ]
                         ];
+                        
                         $resp = $client->get($station_url, $auth_headers);
                         $data = json_decode($resp->getBody());
+
 
                         array_push($locationNameArray,$data->name);
 
@@ -358,6 +364,7 @@ class EveBaseController extends Controller
             //check to make sure the user has a character selected before setting variables
             if($user->current_selected_character_id !== null){
                 $currentSelectedCharacter = Character::where('character_id', $user->current_selected_character_id)->first();
+                
                 return $currentSelectedCharacter;
             }
         }else{
@@ -365,19 +372,28 @@ class EveBaseController extends Controller
         }
     }
 
-    public function resolveSingleCharacterNameFromID($character_id){
-        $character = Character::where('character_id', $character_id)->first();
-
-        return $character->character_name;
+    public function resolveSingleCharacterNameFromID($object){
+         $character_name = Character::where('character_id', $object->character_id)->first()->character_name;
+         
+        return $character_name;
     }
     public function resolveMultipleCharacterNamesFromIDs($objects){
-        //dd($objects);
+        $objectsArr = [];
         foreach($objects as $object){
-
-            $character = Character::where('character_id', $object->character_id)->first();
-
-            $object->character_name = $character->character_name;
+            
+            if($object->character_id){
+                $character = Character::where('character_id', $object->character_id)->first();
+                if($character){
+                    $object->character_name = $character->character_name;
+                }else{
+                    $object->character_name = 'character name not found';
+                }
+            }else{
+                $object->character_name = 'character id not found';
+            }
+            
         }
+        //dd($objectsArr ,$objects);
         return $objects;
     }
 

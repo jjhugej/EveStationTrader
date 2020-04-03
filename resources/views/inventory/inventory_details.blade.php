@@ -11,17 +11,19 @@
         @if($item->logistics_group_id !== null)
             <p>Delivery Group: <a href="{{ config('baseUrl') }}/logistics/{{$item->logistics_group_id}}">{{$item->logistics_group_name}}</a></p>
         @else
-    <p>Delivery Group: <span class="text-danger"> Not Assigned </span><a href="{{ config('baseUrl')}}/inventory/{{$item->id}}/edit"><button class="btn btn-sm btn-info">Add To Delivery Group</button></a></p> </p>
+        <p>Delivery Group: <span class="text-danger"> Not Assigned </span><a href="{{ config('baseUrl')}}/inventory/{{$item->id}}/edit"><button class="btn btn-sm btn-info">Add To Delivery Group</button></a></p> </p>
         @endif
         @if($attachedMarketOrder !== null)
             <p>Attached Market Order: <a href="{{ config('baseUrl')}}/marketorders/{{$attachedMarketOrder->order_id}}"> {{$attachedMarketOrder->typeName}}</a></p>
         @else
-            <p>Assigned Market Order: <span class="text-danger"> Not Assigned </span><a href="#"><button class="btn btn-sm btn-info">Add To Market Order</button></a></p>
+        <p>Assigned Market Order: <span class="text-danger"> Not Assigned </span><a href="{{ config('baseUrl')}}/inventory/{{$item->id}}/edit"><button class="btn btn-sm btn-info">Add To Market Order</button></a></p>
         @endif
         <p>Purchase Price: @formatNumber($item->purchase_price)</p>
         <p>Sell Price: @formatNumber($item->sell_price)</p>
         <p>Amount: @formatNumber($item->amount)</p>
+        <p>Par: @formatNumber($item->par)</p>
         <p>Current Location: {{$item->current_location}}</p>
+        <p>Associated Character: {{$item->character_name}}</p>
         <p>Notes: {{$item->notes}}</p>
         <p>Created At: {{$item->created_at}}</p>
         <p>Updated At: {{$item->updated_at}}</p>

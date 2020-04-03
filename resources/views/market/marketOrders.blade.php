@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1>Market Orders:</h1>
+    <h1 class="mb-4 text-center">Market Orders</h1>
     <div class="table-responsive border">
         <table class="table table-striped table-hover">
             <thead>

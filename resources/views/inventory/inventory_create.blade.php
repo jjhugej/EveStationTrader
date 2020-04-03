@@ -59,9 +59,9 @@
             <textarea  id="notes" name="notes" class="form-control {{$errors->has('notes') ? 'border border-danger' : ''}}" rows="3">{{ old('notes') }}</textarea>
         </div>
         <div class="form-group">
-            <h2 class="text-center">Link Item To Current Market Order</h2>
-        <div class="table-responsive border">
-            <table class="table table-striped table-hover">
+            <h2 class="text-center">Assign Item To Market Order</h2>
+        <div class="table-responsive border mb-4">
+            <table id="deliveryGroupTable" class="table table-striped table-hover">
                 <thead>
                     <tr>
                     <th scope="col">Select</th>
@@ -70,6 +70,7 @@
                     <th scope="col">Volume</th>
                     <th scope="col">Par</th>
                     <th scope="col">Location</th>
+                    <th scope="col">Character Name</th>
                     </tr>
                 </thead>
                 <tbody id="js-market-order-target">
@@ -84,16 +85,17 @@
                             <td>@formatNumber($marketOrder->volume_remain) / @formatNumber($marketOrder->volume_total)</td>
                             <td>N/A</td>
                             <td>{{$marketOrder->locationName}}</td>
+                            <td>{{$marketOrder->character_name}}</td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
         <div class="form-group">
-            <h2 class="text-center">Add Item To Delivery Group</h2>
+            <h2 class="text-center">Assign Item To Delivery Group</h2>
             <a href="{{ config('baseUrl') }}/logistics/create"><button type="button" class="btn btn-primary">+ Create A Delivery Group</button></a>
         <div class="table-responsive border">
-            <table class="table table-striped table-hover">
+            <table id="marketOrderGroupTable" class="table table-striped table-hover mb-4">
                 <thead>
                     <tr>
                         <th scope="col">Select</th>

@@ -7,7 +7,7 @@
       <a href="/inventory">Inventory</a>
       <a href="/logistics">Logistics</a>
       <a href="/marketorders">Market Orders</a>
-      <a href="#">Shopping List</a>
+      <a href="/shoppinglist">Shopping List</a>
       <a href="#">Stations</a>
       <a href="#">Transactions</a>
       <a href="/logout">Sign Out</a>
