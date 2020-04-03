@@ -16,8 +16,8 @@ class CreateShoppingListItemsTable extends Migration
         Schema::create('shopping_list_items', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('user_id');
-            $table->bigInteger('character_id');
             $table->bigInteger('type_id')->nullable();
+            $table->bigInteger('shopping_list_id')->nullable();
             $table->string('name')->nullable();
             $table->bigInteger('logistics_group_id')->nullable();
             $table->bigInteger('market_order_id')->nullable();

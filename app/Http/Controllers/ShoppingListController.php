@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\ShoppingList;
+use App\ShoppingListItem;
 use App\Character;
 use App\User;
 use App\EveItem;
@@ -70,8 +71,9 @@ class ShoppingListController extends EveBaseController
      */
     public function show(ShoppingList $shoppingList)
     {
-        //dd($shoppingListID);
-        return view('shoppinglist.shoppinglist_details', compact('shoppingList'));
+        $shoppingListItems = ShoppingListItem::where('user_id', Auth::user()->id)->where('shopping_list_id', $shoppingList->id)->get();
+
+        return view('shoppinglist.shoppinglist_details', compact('shoppingList', 'shoppingListItems'));
     }
 
     /**
@@ -82,7 +84,9 @@ class ShoppingListController extends EveBaseController
      */
     public function edit(ShoppingList $shoppingList)
     {
-        //
+        //dd($shoppingList);
+
+        return view('shoppinglist.shoppinglist_edit', compact('shoppingList'));
     }
 
     /**
@@ -94,7 +98,20 @@ class ShoppingListController extends EveBaseController
      */
     public function update(Request $request, ShoppingList $shoppingList)
     {
-        //
+        $validatedData = $request->validate([
+        'name' => 'required|max:255',
+        'notes' => 'nullable|max:1000',
+        ]);
+
+        $shoppingListInstance = ShoppingList::where('id', $shoppingList->id)->first();
+        
+        $shoppingListInstance->user_id = Auth::user()->id;
+        $shoppingListInstance->name = $validatedData['name'];
+        $shoppingListInstance->notes = $validatedData['notes'];
+
+        $shoppingListInstance->save();
+
+        return redirect('/shoppinglist');
     }
 
     /**
@@ -105,6 +122,10 @@ class ShoppingListController extends EveBaseController
      */
     public function destroy(ShoppingList $shoppingList)
     {
-        //
+        $shoppingListInstance = ShoppingList::where('id', $shoppingList->id)->first();
+
+        $shoppingListInstance->delete();
+
+        return redirect('/shoppinglist');
     }
 }

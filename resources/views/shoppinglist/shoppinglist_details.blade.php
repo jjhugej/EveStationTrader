@@ -6,15 +6,53 @@
 
     <h1 class="text-center mb-5">Shopping List Detailed View</h1>
 
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <div class="container border mb-4 p-4">
         <p>Name: {{$shoppingList->name}}</p>
         <p>Notes: {{$shoppingList->notes}}</p>
         <p>Created On: {{ date('d-m-y', strtotime($shoppingList->created_at)) }}</p>
         <p>Last Update: {{ date('d-m-y', strtotime($shoppingList->updated_at)) }}</p>
+        <a class ="col" href="/shoppinglist/{{$shoppingList->id}}/edit"><button class="btn btn-primary">Edit Shopping List</button></a>
+        <a class ="col" href="/shoppinglist/{{$shoppingList->id}}/delete"><button class="btn btn-danger">Delete Shopping List</button></a>
+    </div>
+
+    <h1 class="text-center mb-3">Items In This Shopping List:</h1>
+
+    <a href="{{ config('baseUrl') }}/inventory/create"><button class="btn btn-primary mb-1">+ Add Item</button></a>
+    <div class="table-responsive border mb-3">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                <th scope="col">Item</th>
+                <th scope="col">Purchase Price</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Remove</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($shoppingListItems as $shoppingListItem)
+                    <tr>
+                        <th class="fit" scope="row"> <a href="{{ config('baseUrl') }}/shoppinglistitem/{{$shoppingListItem->id}}">{{$shoppingListItem->name}}</a></th>
+                        <td>{{$shoppingListItem->purchase_price}}</td>
+                        <td>{{$shoppingListItem->amount}}</td>
+                    <td><a href="{{ config('baseUrl') }}/shoppinglistitem/{{$shoppingListItem->id}}/remove">Remove</a></td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
     </div>
 
     <h2 class="text-center">Add Item To Shopping List</h2>
-    <form method="POST" action="{{ config('baseUrl') }}/shoppinglistitem/create">
+    <form method="POST" action="{{ config('baseUrl') }}/shoppinglistitem/create/{{$shoppingList->id}}">
         
         @csrf
 

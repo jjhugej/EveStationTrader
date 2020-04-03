@@ -62,3 +62,14 @@ Route::get('/shoppinglist', 'ShoppingListController@index')->middleware('auth');
 Route::get('/shoppinglist/create', 'ShoppingListController@create')->middleware('auth');
 Route::post('/shoppinglist/create', 'ShoppingListController@store')->middleware('auth');
 Route::get('/shoppinglist/{shoppingList}', 'ShoppingListController@show')->middleware('auth');
+Route::get('/shoppinglist/{shoppingList}/edit', 'ShoppingListController@edit')->middleware('auth');
+Route::put('/shoppinglist/{shoppingList}/edit', 'ShoppingListController@update')->middleware('auth');
+Route::get('/shoppinglist/{shoppingList}/delete', 'ShoppingListController@destroy')->middleware('auth');
+
+
+//Shopping List Items
+Route::post('/shoppinglistitem/create/{shoppingListID}', 'ShoppingListItemController@store')->middleware('auth');
+Route::get('/shoppinglistitem/{shoppingListItem}', 'ShoppingListItemController@show')->middleware('auth');
+Route::get('/shoppinglistitem/{shoppingListItem}/edit', 'ShoppingListItemController@edit')->middleware('auth');
+Route::put('/shoppinglistitem/{shoppingListItem}/edit', 'ShoppingListItemController@update')->middleware('auth');
+Route::get('/shoppinglistitem/{shoppingListItem}/delete', 'ShoppingListItemController@show')->middleware('auth');

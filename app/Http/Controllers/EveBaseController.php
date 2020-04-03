@@ -231,6 +231,7 @@ class EveBaseController extends Controller
 
 
      public function resolveTypeIDToItemName($eveObjectDatas){
+         //dd($eveObjectDatas);
         /*
             CCP sends back a type_id which corresponds to an item name from their static dump file.
             The table name for the item names from the dump is: invTypes. Renamed to eveItems in our DB
@@ -245,6 +246,24 @@ class EveBaseController extends Controller
             $eveObjectData->typeName = $typeName;
         }
         return $eveObjectDatas;
+    }
+
+
+    public function resolveSingleItemNameToTypeID($eveObjectData){
+        $typeID = EveItem::where('typeName', $eveObjectData->name)->pluck('typeID')->first();
+        $eveObjectData->type_id = $typeID;
+        return $eveObjectData;
+    }
+    
+
+    public function resolveMultipleItemNamesToTypeID($eveObjectDatas){
+
+        foreach($eveObjectDatas as $eveObjectData){
+            $typeID = EveItem::where('typeName', $eveObjectData->name)->pluck('typeID')->first();
+            $eveObjectData->type_id = $typeID;
+        }
+        return $eveObjectDatas;
+
     }
     
 
