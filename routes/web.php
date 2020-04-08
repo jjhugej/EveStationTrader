@@ -72,4 +72,4 @@ Route::post('/shoppinglistitem/create/{shoppingListID}', 'ShoppingListItemContro
 Route::get('/shoppinglistitem/{shoppingListItem}', 'ShoppingListItemController@show')->middleware('auth');
 Route::get('/shoppinglistitem/{shoppingListItem}/edit', 'ShoppingListItemController@edit')->middleware('auth');
 Route::put('/shoppinglistitem/{shoppingListItem}/edit', 'ShoppingListItemController@update')->middleware('auth');
-Route::get('/shoppinglistitem/{shoppingListItem}/delete', 'ShoppingListItemController@show')->middleware('auth');
+Route::get('/shoppinglistitem/{shoppingListItem}/delete', 'ShoppingListItemController@destroy')->middleware('auth');

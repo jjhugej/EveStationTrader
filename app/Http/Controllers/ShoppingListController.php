@@ -15,7 +15,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 
-class ShoppingListController extends EveBaseController
+class ShoppingListController extends ShoppingListBaseController
 {
     /**
      * Display a listing of the resource.
@@ -71,7 +71,7 @@ class ShoppingListController extends EveBaseController
      */
     public function show(ShoppingList $shoppingList)
     {
-        $shoppingListItems = ShoppingListItem::where('user_id', Auth::user()->id)->where('shopping_list_id', $shoppingList->id)->get();
+        $shoppingListItems = ShoppingListItem::where('user_id', Auth::user()->id)->where('shopping_list_id', $shoppingList->id)->orderBy('status', 'asc')->get();
 
         return view('shoppinglist.shoppinglist_details', compact('shoppingList', 'shoppingListItems'));
     }

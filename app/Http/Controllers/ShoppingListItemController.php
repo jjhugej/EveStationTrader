@@ -15,7 +15,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 
-class ShoppingListItemController extends EveBaseController
+class ShoppingListItemController extends ShoppingListBaseController
 {
     /**
      * Display a listing of the resource.
@@ -72,6 +72,11 @@ class ShoppingListItemController extends EveBaseController
         $shoppingListItemInstance->notes = $validatedData['notes'];
         
         $shoppingListItemInstance = $this->resolveSingleItemNameToTypeID($shoppingListItemInstance);
+
+            //if item is already purchased - and the user wants to- make a new inventory item for it
+        if($request->inventoryCheckBox && $validatedData['status'] === 'Purchased'){
+            $this->createNewInventoryItemFromShoppingListItem($shoppingListItemInstance);
+        }
 
         $shoppingListItemInstance->save();
 
@@ -141,6 +146,11 @@ class ShoppingListItemController extends EveBaseController
         
         $shoppingListItemInstance = $this->resolveSingleItemNameToTypeID($shoppingListItemInstance);
 
+        //if item is already purchased make a new inventory item for it
+        if($request->inventoryCheckBox && $validatedData['status'] === 'Purchased'){
+            $this->createNewInventoryItemFromShoppingListItem($shoppingListItemInstance);
+        }
+
         $shoppingListItemInstance->save();
 
         return redirect('/shoppinglistitem/' . $shoppingListItem->id);
@@ -154,6 +164,10 @@ class ShoppingListItemController extends EveBaseController
      */
     public function destroy(ShoppingListItem $shoppingListItem)
     {
-        //
+        $shoppingListItemInstance = ShoppingListItem::where('id', $shoppingListItem->id)->first();
+
+        $shoppingListItemInstance->delete();
+
+        return back();
     }
 }

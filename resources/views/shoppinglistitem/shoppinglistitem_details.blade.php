@@ -4,6 +4,22 @@
 
     <h1 class="text-center">Shopping List Item Detailed View</h1>
 
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+    
+    @if(Session::has('status'))
+        <div class="alert alert-success">
+        {{ Session::get('status')}}
+        </div>
+    @endif
+
     <div class="container border mb-4 p-4">
         <p>Item Name: {{$shoppingListItem->name}}</p>
         <p>Status: {{$shoppingListItem->status}}</p>

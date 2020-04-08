@@ -55,7 +55,7 @@ class MarketBaseController extends EveBaseController
                     
                     
                     $selectedCharacter = Character::where('user_id', Auth::user()->id)->where('is_selected_character', 1)->first();
-                    $selectedCharacter->next_available_esi_market_fetch = Carbon::now()->addminutes(2)->toDateTimeString(); 
+                    $selectedCharacter->next_available_esi_market_fetch = Carbon::now()->addminutes(10)->toDateTimeString(); 
         
             
                     $selectedCharacter->save();
@@ -100,7 +100,7 @@ class MarketBaseController extends EveBaseController
                 $marketOrderInstance->save(); 
                 $marketOrderInstance->character_name = $this->resolveSingleCharacterNameFromID($currentSelectedCharacter);
                 
-                
+               
                 array_push($marketOrderArray, $marketOrderInstance);
                
             }else{
@@ -123,15 +123,16 @@ class MarketBaseController extends EveBaseController
                 $marketOrderInstance->type_id = $marketOrder->type_id;
                 $marketOrderInstance->volume_remain = $marketOrder->volume_remain;
                 $marketOrderInstance->volume_total = $marketOrder->volume_total;
-
+                
                 $marketOrderInstance->save();
-                $marketOrderInstance = $this->resolveSingleCharacterNameFromID($currentSelectedCharacter);
-            
+                $marketOrderInstance->character_name = $this->resolveSingleCharacterNameFromID($currentSelectedCharacter);
+
+                
                 array_push($marketOrderArray, $marketOrderInstance);
             }
         }  
         
-        //dd($marketOrderArray);
+        
         return $marketOrderArray;
     }
 

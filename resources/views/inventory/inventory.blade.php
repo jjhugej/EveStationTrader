@@ -14,7 +14,6 @@
                     <th scope="col">Delivery Group</th>
                     <th scope="col">Current Location</th>
                     <th scope="col">Assigned Market Order</th>
-                    <th scope="col">Created By</th>
                     <th scope="col">Created At</th>
                 </tr>
             </thead>
@@ -36,10 +35,8 @@
                         @else
                             <td><a href="{{config('baseUrl')}}/marketorders/{{$item->market_order_id}}">View</a></td>
                         @endif
-                        <td>{{$item->character_name}}</td>
                         <td>{{date('d-M-y', strtotime($item->created_at))}}</td>    
-                        <td> <a href="{{ config('baseUrl') }}/inventory/{{$item->id}}/edit">edit</a></td>
-                        <td> <a href="{{ config('baseUrl') }}/inventory/{{$item->id}}/delete">delete</a></td>
+                        <td> <a href="{{ config('baseUrl') }}/inventory/{{$item->id}}/edit">edit</a></td>     
                     </tr>
                 @endforeach
             </tbody>

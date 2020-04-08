@@ -1,5 +1,4 @@
 $(document).ready(function() {
-    console.log("fgsth");
     //search field keyup event and ajax call
     $("#name").keyup(function() {
         $.get("http://evestationtrader.test/inventory/itemsearch", {
@@ -32,9 +31,7 @@ $(document).ready(function() {
         "click",
         ".market-order-id-select",
         function() {
-            //console.log($(this).prop("checked"));
             if ($(this).prop("checked") == true) {
-                //console.log($(this).val());
                 let itemPropertyArray = $(this)
                     .val()
                     .split(",");
@@ -42,34 +39,7 @@ $(document).ready(function() {
                 $("#sell_price").val(itemPropertyArray[2]);
                 $("#amount").val(itemPropertyArray[4]);
                 $("#current_location").val(itemPropertyArray[5]);
-                //console.log(itemPropertyArray);
             }
         }
     );
 });
-//$(this).val()
-//$("#name").val($(this).val());
-/*
-                $.get("http://evestationtrader.test/inventory/itemsearch", function(
-                    data
-                ) {
-                    $("#js_item_search_results_target").empty();
-                    $("#js_item_search_results_target").append(data);
-                });
-*/
-//inputField = document.getElementById("name");
-//console.log(inputField.value);
-
-/*
-function fetchItemSearchResults() {
-    fetch("itemSearch")
-        .then(response => response.text())
-        .then(html => {
-            document.querySelector(
-                "#js_item_search_results_target"
-            ).innerHTML = html;
-        });
-}
-*/
-
-//inputField.addEventListener("keyup", console.log(inputField.value));

@@ -26,7 +26,7 @@ class InventoryController extends InventoryBaseController
      */
     public function index()
     {
-        $inventoryItems = Inventory::where('user_id', Auth::user()->id)->get();
+        $inventoryItems = Inventory::where('user_id', Auth::user()->id)->orderBy('name', 'asc')->get();
         $items = $this->resolveMultipleLogisticsGroupIDToName($inventoryItems);
         $items = $this->resolveMultipleCharacterNamesFromIDs($items);
         

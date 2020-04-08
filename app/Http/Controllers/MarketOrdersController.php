@@ -40,6 +40,8 @@ class MarketOrdersController extends MarketBaseController
 
             $marketOrders = $this->resolveStationIDToName($currentSelectedCharacter, $marketOrders);
 
+            $marketOrders = collect($marketOrders)->sortBy('typeName');
+
             return view('market.marketOrders', compact('marketOrders'));
         }
         else{

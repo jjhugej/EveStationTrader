@@ -242,6 +242,7 @@ class EveBaseController extends Controller
         //dd($marketOrders);
 
         foreach($eveObjectDatas as $eveObjectData){
+            
             $typeName = EveItem::where('typeID', $eveObjectData->type_id)->pluck('typeName')->first();
             $eveObjectData->typeName = $typeName;
         }

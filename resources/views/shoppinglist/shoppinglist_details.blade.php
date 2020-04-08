@@ -6,6 +6,12 @@
 
     <h1 class="text-center mb-5">Shopping List Detailed View</h1>
 
+    @if(Session::has('status'))
+        <div class="alert alert-success">
+        {{ Session::get('status')}}
+        </div>
+    @endif
+
     @if ($errors->any())
         <div class="alert alert-danger">
             <ul>
@@ -35,16 +41,18 @@
                 <th scope="col">Item</th>
                 <th scope="col">Purchase Price</th>
                 <th scope="col">Amount</th>
-                <th scope="col">Remove</th>
+                <th scope="col">Status</th>
+                
                 </tr>
             </thead>
             <tbody>
                 @foreach($shoppingListItems as $shoppingListItem)
                     <tr>
                         <th class="fit" scope="row"> <a href="{{ config('baseUrl') }}/shoppinglistitem/{{$shoppingListItem->id}}">{{$shoppingListItem->name}}</a></th>
-                        <td>{{$shoppingListItem->purchase_price}}</td>
-                        <td>{{$shoppingListItem->amount}}</td>
-                    <td><a href="{{ config('baseUrl') }}/shoppinglistitem/{{$shoppingListItem->id}}/remove">Remove</a></td>
+                        <td>@formatNumber($shoppingListItem->purchase_price)</td>
+                        <td>@formatNumber($shoppingListItem->amount)</td>
+                        <td>{{$shoppingListItem->status}}</td>
+                    <td><a href="{{ config('baseUrl') }}/shoppinglistitem/{{$shoppingListItem->id}}/delete">Delete</a></td>
                     </tr>
                 @endforeach
             </tbody>
@@ -71,7 +79,7 @@
                 <input type="number" name="purchase_price" id ="purchase_price" class="form-control {{$errors->has('purchase_price') ? 'border border-danger' : ''}}" value="{{ old('purchase_price') }}" placeholder="">
             </div>
             <div class="col">
-                <label for="sell_price">Sell Price:</label>
+                <label for="sell_price">Estimated Sell Price:</label>
                 <input type="number" name="sell_price" id = "sell_price" class="form-control {{$errors->has('sell_price') ? 'border border-danger' : ''}}" value="{{ old('sell_price') }}" placeholder="">
             </div>
             <div class="form-group col">
@@ -100,6 +108,10 @@
                 <option value="Purchased">Purchased</option>
             </select>
         </div>
+        <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" name="inventoryCheckBox" id="inventoryCheckBox">
+                <label class="form-check-label" for="inventoryCheckBox">Add item to inventory?</label>
+            </div>
         <div class="form-group">
             <label for="notes">Notes:</label>
             <textarea  id="notes" name="notes" class="form-control {{$errors->has('notes') ? 'border border-danger' : ''}}" rows="3">{{ old('notes') }}</textarea>

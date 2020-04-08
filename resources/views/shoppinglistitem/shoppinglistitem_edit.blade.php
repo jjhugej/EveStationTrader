@@ -64,6 +64,10 @@
                 <option value="Not Purchased">Not Purchased</option>
                 <option value="Purchased">Purchased</option>
             </select>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" name="inventoryCheckBox" id="inventoryCheckBox">
+                <label class="form-check-label" for="inventoryCheckBox">Add item to inventory?</label>
+            </div>
         </div>
         <div class="form-group">
             <label for="notes">Notes:</label>
