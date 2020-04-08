@@ -6,6 +6,7 @@
 
     <div class="container border mb-4 p-4">
         <p>Item Name: {{$shoppingListItem->name}}</p>
+        <p>Status: {{$shoppingListItem->status}}</p>
         <p>Assigned Shopping List: <a href="{{ config('baseUrl') }}/shoppinglist/{{$shoppingListItem->shopping_list_id}}"> {{$assignedShoppingList->name}} </a></p>
         <p>Delivery Group: {{$shoppingListItem->logistics_group_id}}</p>
         <p>Assigned Market Order: {{$shoppingListItem->market_order_id}}</p>

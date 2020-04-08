@@ -19,6 +19,7 @@ class CreateCharactersTable extends Migration
             $table->foreign('user_id')->references('id')->on('users');
             $table->bigInteger('character_id')->nullable();
             $table->bigInteger('corporation_id')->nullable();
+            $table->string('portrait')->nullable();
             $table->string('corporation_name')->nullable();
             $table->string('character_name')->nullable();
             $table->longText('access_token')->nullable();
@@ -29,6 +30,7 @@ class CreateCharactersTable extends Migration
             $table->dateTime('next_available_esi_market_fetch')->nullable();
             $table->dateTime('next_available_esi_transactions_fetch')->nullable();
             $table->dateTime('next_available_esi_inventory_fetch')->nullable();
+            $table->dateTime('next_available_esi_portrait_fetch')->nullable();
             $table->timestamps();
         });
     }

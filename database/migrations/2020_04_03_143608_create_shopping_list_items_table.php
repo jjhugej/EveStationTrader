@@ -19,8 +19,10 @@ class CreateShoppingListItemsTable extends Migration
             $table->bigInteger('type_id')->nullable();
             $table->bigInteger('shopping_list_id')->nullable();
             $table->string('name')->nullable();
+            $table->string('status');
             $table->bigInteger('logistics_group_id')->nullable();
             $table->bigInteger('market_order_id')->nullable();
+            $table->bigInteger('inventory_item_id')->nullable();
             $table->bigInteger('purchase_price')->nullable();
             $table->bigInteger('sell_price')->nullable();
             $table->bigInteger('amount')->nullable();

@@ -58,6 +58,13 @@
                 <label for="current_location">Current Location:</label>
                 <input type="text" name="current_location" id="current_location" class="form-control {{$errors->has('current_location') ? 'border border-danger' : ''}}" value="{{ $shoppingListItem->current_location }}" placeholder="">
             </div>
+            <div class="form-group">
+            <label for="status" class="my-1 mr-2">Status:</label>
+            <select name="status" id="status" class="custom-select my-1 mr-sm-2">
+                <option value="Not Purchased">Not Purchased</option>
+                <option value="Purchased">Purchased</option>
+            </select>
+        </div>
         <div class="form-group">
             <label for="notes">Notes:</label>
             <textarea  id="notes" name="notes" class="form-control {{$errors->has('notes') ? 'border border-danger' : ''}}" rows="3">{{ $shoppingListItem->notes }}</textarea>

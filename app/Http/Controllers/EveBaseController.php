@@ -187,7 +187,7 @@ class EveBaseController extends Controller
                 $characterModel = Character::where('character_id', $characterCredentials->CharacterID)->first();
 
                 $characterModel->user_id = Auth::user()->id;
-                $characterModel->last_fetch = Carbon::now();
+                $characterModel->last_esi_token_fetch = Carbon::now();
                 $characterModel->expires = $characterCredentials->ExpiresOn;
                 $characterModel->access_token = $tokens->access_token;
                 $characterModel->refresh_token = $tokens->refresh_token;

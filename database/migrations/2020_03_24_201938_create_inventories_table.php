@@ -21,6 +21,7 @@ class CreateInventoriesTable extends Migration
             $table->string('name')->nullable();
             $table->bigInteger('logistics_group_id')->nullable();
             $table->bigInteger('market_order_id')->nullable();
+            $table->bigInteger('shopping_list_item_id')->nullable();
             $table->bigInteger('purchase_price')->nullable();
             $table->bigInteger('sell_price')->nullable();
             $table->bigInteger('amount')->nullable();

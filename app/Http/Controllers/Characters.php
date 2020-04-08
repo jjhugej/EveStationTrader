@@ -11,7 +11,7 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 
 
-class Characters extends EveBaseController
+class Characters extends CharactersBaseController
 {
     /**
      * Display a listing of the resource.
@@ -22,6 +22,18 @@ class Characters extends EveBaseController
     {
         // this method returns all the characters attached to the authenticated user
         $characters = auth()->user()->characters()->get();
+
+        //check the last time the character requested character info from ESI
+        //if ESI hasn't been called in 10 days get the character portrait
+        foreach($characters as $character){
+            //dd($character->next_available_esi_portrait_fetch < Carbon::now());
+                if($character->next_available_esi_portrait_fetch < Carbon::now() || $character->next_available_esi_portrait_fetch == null){
+                $character->next_available_esi_portrait_fetch = Carbon::now()->addDays(10);
+                $character->portrait = $this->getCharacterPortrait($character)->px128x128;
+                $character->save();
+            }
+        }
+
         return view('characters', compact('characters'));
     }
 
@@ -70,6 +82,13 @@ class Characters extends EveBaseController
        $character = auth()->user()->characters()->where('character_id', $request->character_id)->firstOrFail();
        $character->is_selected_character = 1;
        $character->save();
+
+       $character->portrait = $this->getCharacterPortrait($character);
+
+       $character->next_available_esi_portrait_fetch = Carbon::now()->addDays(10);
+
+       //set character portrait in the session
+       $this->setCharacterPortrait($character);
 
         return redirect('characters');
     }
@@ -126,7 +145,11 @@ class Characters extends EveBaseController
         $character = auth()->user()->characters()->where('character_id', $request->character_id)->firstOrFail();
         $character->user_id = null;
         $character->is_selected_character = 0;
+
         $character->save();
+
+        $this->unsetCharacterPortrait($request);
+
         return redirect('characters');
 
     }

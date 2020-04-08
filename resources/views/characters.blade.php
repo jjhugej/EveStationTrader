@@ -15,11 +15,20 @@
 
         <div class="card mb-2">
             <div class="card-body">
-                <h5 class="card-title">{{$character->character_name}}</h5>
+                <h5 class="card-title">{{$character->character_name}}</h5>  
+
+                @if($character->is_selected_character == 0)
+                    <a href="/selectcharacter/{{$character->character_id}}"><img id = "profilePicture" class="d-block mb-3" src="{{$character->portrait}}" alt=""></a>
+                @else
+                    <a href=""><img id = "profilePicture" class="d-block mb-3" src="{{$character->portrait}}" alt=""></a>
+                @endif
+
                 @if($character->is_selected_character == 0)
                     <a href="/selectcharacter/{{$character->character_id}}" class="btn btn-primary">Select Character</a>
                 @endif
+
                     <a href="/dropcharacter/{{$character->character_id}}" class="btn btn-danger">Drop Character</a>
+                    
             </div>
         </div>
 

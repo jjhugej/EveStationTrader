@@ -53,6 +53,7 @@ class ShoppingListItemController extends EveBaseController
         'amount' => 'nullable|integer',
         'par' => 'nullable|integer',
         'current_location' => 'nullable',
+        'status' => 'required',
         'notes' => 'nullable|max:1000',
         ]);
         
@@ -67,6 +68,7 @@ class ShoppingListItemController extends EveBaseController
         $shoppingListItemInstance->amount = $validatedData['amount'];
         $shoppingListItemInstance->par = $validatedData['par'];
         $shoppingListItemInstance->current_location = $validatedData['current_location'];
+        $shoppingListItemInstance->status = $validatedData['status'];
         $shoppingListItemInstance->notes = $validatedData['notes'];
         
         $shoppingListItemInstance = $this->resolveSingleItemNameToTypeID($shoppingListItemInstance);
@@ -119,6 +121,7 @@ class ShoppingListItemController extends EveBaseController
         'amount' => 'nullable|integer',
         'par' => 'nullable|integer',
         'current_location' => 'nullable',
+        'status' => 'required',
         'notes' => 'nullable|max:1000',
         ]);
         
@@ -133,6 +136,7 @@ class ShoppingListItemController extends EveBaseController
         $shoppingListItemInstance->amount = $validatedData['amount'];
         $shoppingListItemInstance->par = $validatedData['par'];
         $shoppingListItemInstance->current_location = $validatedData['current_location'];
+        $shoppingListItemInstance->status = $validatedData['status'];
         $shoppingListItemInstance->notes = $validatedData['notes'];
         
         $shoppingListItemInstance = $this->resolveSingleItemNameToTypeID($shoppingListItemInstance);

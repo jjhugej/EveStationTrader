@@ -1,5 +1,9 @@
   <div id="sideBarNav">
-    <img id = "profilePicture" src="https://pickaface.net/gallery/avatar/44947415_161203_0634_2om7fql.png" alt="">
+    @if(Session::has('characterPortrait'))
+      <img id = "profilePicture" src="{{Session::get('characterPortrait')}}" alt="">
+    @else
+      <img id = "profilePicture" src="https://texasgeneralinsurance.com/wp-content/uploads/Person-placeholder.png" alt="">
+    @endif
     <div id="sideBarLinkWrapper">
       <a href="/dashboard">Dashboard</a>
       <a href="#">Accounting</a>
