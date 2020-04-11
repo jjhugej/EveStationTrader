@@ -73,3 +73,10 @@ Route::get('/shoppinglistitem/{shoppingListItem}', 'ShoppingListItemController@s
 Route::get('/shoppinglistitem/{shoppingListItem}/edit', 'ShoppingListItemController@edit')->middleware('auth');
 Route::put('/shoppinglistitem/{shoppingListItem}/edit', 'ShoppingListItemController@update')->middleware('auth');
 Route::get('/shoppinglistitem/{shoppingListItem}/delete', 'ShoppingListItemController@destroy')->middleware('auth');
+
+
+//Transactions Partials
+Route::get('/transactions/search', 'TransactionsController@search')->middleware('auth');
+
+//Transactions
+Route::get('/transactions', 'TransactionsController@index')->middleware('auth');

@@ -79,6 +79,8 @@ class MarketBaseController extends EveBaseController
             //check if the marketOrder already exists in the DB
             if(MarketOrders::where('order_id', $marketOrder->order_id)->first() !== null){
                 //if marketOrder exists, update the record
+
+                //look into moving currentSelected character out of the foreach so that its not built up every time
                 $currentSelectedCharacter = Character::where('user_id', Auth::user()->id)->where('is_selected_character', 1)->first();
 
                 $marketOrderInstance = MarketOrders::where('order_id', $marketOrder->order_id)->first();

@@ -13,7 +13,7 @@
       <a href="/marketorders">Market Orders</a>
       <a href="/shoppinglist">Shopping List</a>
       <a href="#">Stations</a>
-      <a href="#">Transactions</a>
+      <a href="/transactions">Transactions</a>
       <a href="/logout">Sign Out</a>
     </div>
   </div>

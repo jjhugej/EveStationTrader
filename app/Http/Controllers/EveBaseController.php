@@ -231,7 +231,6 @@ class EveBaseController extends Controller
 
 
      public function resolveTypeIDToItemName($eveObjectDatas){
-         //dd($eveObjectDatas);
         /*
             CCP sends back a type_id which corresponds to an item name from their static dump file.
             The table name for the item names from the dump is: invTypes. Renamed to eveItems in our DB
@@ -239,14 +238,12 @@ class EveBaseController extends Controller
 
             SECOND NOTE: THIS WILL RETURN THE OBJECT BACK WITH A PROPERTY OF "typeName" WHICH IS NOT PERSISTED ON THE "eveItem" TABLE
         */
-        //dd($marketOrders);
-
-        foreach($eveObjectDatas as $eveObjectData){
-            
-            $typeName = EveItem::where('typeID', $eveObjectData->type_id)->pluck('typeName')->first();
-            $eveObjectData->typeName = $typeName;
-        }
-        return $eveObjectDatas;
+            foreach($eveObjectDatas as $eveObjectData){
+                
+                $typeName = EveItem::where('typeID', $eveObjectData->type_id)->pluck('typeName')->first();
+                $eveObjectData->typeName = $typeName;
+            }
+            return $eveObjectDatas;
     }
 
 

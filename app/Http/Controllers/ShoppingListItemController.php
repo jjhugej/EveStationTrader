@@ -15,7 +15,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 
-class ShoppingListItemController extends ShoppingListBaseController
+class ShoppingListItemController extends ShoppingListItemBaseController
 {
     /**
      * Display a listing of the resource.

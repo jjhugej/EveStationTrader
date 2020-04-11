@@ -2,8 +2,6 @@
 
 @section('content')
 
-<a href="{{ url()->previous() }}"><button class="btn btn-danger">< Back</button></a>
-
     <h1 class="text-center mb-5">Shopping List Detailed View</h1>
 
     @if(Session::has('status'))

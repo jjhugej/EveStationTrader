@@ -19,7 +19,7 @@
                 @foreach($shoppingLists as $shoppingList)
                     <tr>
                         <th class="fit" scope="row"><a href="/shoppinglist/{{$shoppingList->id}}"> {{$shoppingList->name}} </a></th>
-                        <td>n/a</td>
+                        <td>@formatNumber($shoppingList->item_count)</td>
                         <td>{{ date('d-m-y', strtotime($shoppingList->created_at)) }}</td>
                         <td><a href="{{ config('baseUrl') }}/shoppinglist/{{$shoppingList->id}}/edit">edit</a></td>
                     </tr>

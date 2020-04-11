@@ -25,6 +25,10 @@ class ShoppingListController extends ShoppingListBaseController
     public function index()
     {
         $shoppingLists = ShoppingList::where('user_id', Auth::user()->id)->get();
+        //dd($shoppingLists);
+        foreach($shoppingLists as $shoppingList){
+            $shoppingList->item_count = count(ShoppingListItem::where('shopping_list_id', $shoppingList->id)->get());
+        }
 
         return view('shoppinglist.shoppinglist', compact('shoppingLists'));
     }
