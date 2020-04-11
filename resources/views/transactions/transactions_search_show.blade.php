@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-
-    <h1 class="text-center mb-5">Transactions</h1>
+<a href="{{ url()->previous() }}"><button class="btn btn-danger">< Back</button></a>
+    <h1 class="text-center mb-5">Transactions Search View</h1>
     <form action="{{ config('baseUrl') }}/transactions/search/show" method="GET">
         
         @csrf
@@ -23,6 +23,13 @@
 
     </form>
 
+    <p><span class="font-italic">Currently showing results for: </span> 
+        @if($searchMatches !== null)
+         <span class="font-weight-bold">{{$searchMatches[0]->typeName}} </span></p>
+        @else
+           <span class="font-weight-bold text-danger">Item Not Found In This Character's History</span></p>
+        @endif
+
     <div class="table-responsive border">
         <table class="table table-striped table-hover">
             <thead>
@@ -37,22 +44,24 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($transactionHistory as $transactionHistory)
-                    <tr>
-                        <td>{{$transactionHistory->typeName}}</td>
-                        <td>@formatNumber($transactionHistory->unit_price)</td>
-                        <td>@formatNumber($transactionHistory->quantity)</td>
-                
-                        @if($transactionHistory->is_buy == 0)
-                            <td>Sell</td>
-                        @else
-                            <td>Buy</td>
-                        @endif
-                        
-                        <td>{{date('d-M-y', strtotime($transactionHistory->date))}}</td>
-                        <td> <a href="#">edit</a></td>     
-                    </tr>
-                @endforeach
+                @if($searchMatches !== null)
+                    @foreach($searchMatches as $searchMatch)
+                        <tr>
+                            <td>{{$searchMatch->typeName}}</td>
+                            <td>@formatNumber($searchMatch->unit_price)</td>
+                            <td>@formatNumber($searchMatch->quantity)</td>
+                    
+                            @if($searchMatch->is_buy == 0)
+                                <td>Sell</td>
+                            @else
+                                <td>Buy</td>
+                            @endif
+                            
+                            <td>{{date('d-M-y', strtotime($searchMatch->date))}}</td>
+                            <td> <a href="#">edit</a></td>     
+                        </tr>
+                    @endforeach                        
+                @endif
             </tbody>
         </table>
     </div>

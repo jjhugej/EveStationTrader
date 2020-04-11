@@ -53,7 +53,7 @@ class TransactionsBaseController extends EveBaseController
                     
                     //update the last transactions fetch for the selected character                    
                     $selectedCharacter = Character::where('user_id', Auth::user()->id)->where('is_selected_character', 1)->first();
-                    $selectedCharacter->next_available_esi_transactions_fetch = Carbon::now()->addminutes(5)->toDateTimeString(); 
+                    $selectedCharacter->next_available_esi_transactions_fetch = Carbon::now()->addminutes(15)->toDateTimeString(); 
         
                     $selectedCharacter->save();
                     

@@ -118,10 +118,35 @@ class TransactionsController extends TransactionsBaseController
         
         //TODO: hook up search feature with transactions
         $searchRequest = $request->searchRequest;
+
         if($searchRequest !== null){
-            $searchMatches = EveItem::where('typeName', 'LIKE','%'.$searchRequest.'%')->take(30)->get();
-            return view('inventory._item_search', compact('searchMatches'));
+            $searchMatches = EveItem::where('typeName', 'LIKE','%'.$searchRequest.'%')->orderByRaw('CHAR_LENGTH(typeName)')->take(40)->get();
+            return view('transactions._transaction_search', compact('searchMatches'));
         }
+    }
+
+    public function searchShow(Request $request){
+        //this method returns a table that mimicks the transactions->index page for a specific item in their transactions log
+     
+
+        $typeID = EveItem::where('typeName', $request->name)->pluck('typeID')->first();
+
+        if($typeID !== null){
+            $searchMatches = Transactions::where('type_id', $typeID)->get();
+
+            if($searchMatches->isEmpty()){
+                $searchMatches = null;
+            }else{
+                $searchMatches = $this->resolveTypeIDToItemName($searchMatches);
+            }
+        }
+        else{
+            $searchMatches = null;
+        }
+
+        return view('transactions.transactions_search_show', compact('searchMatches'));
+        
+        
     }
     
 }
