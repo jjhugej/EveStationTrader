@@ -81,3 +81,5 @@ Route::get('/transactions/search', 'TransactionsController@search')->middleware(
 //Transactions
 Route::get('/transactions', 'TransactionsController@index')->middleware('auth');
 Route::get('/transactions/search/show', 'TransactionsController@searchShow')->middleware('auth');
+Route::get('/transactions/search/sell', 'TransactionsController@searchSell')->middleware('auth');
+Route::get('/transactions/search/buy', 'TransactionsController@searchBuy')->middleware('auth');

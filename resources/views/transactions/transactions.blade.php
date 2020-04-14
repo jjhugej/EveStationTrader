@@ -20,8 +20,13 @@
                 <!-- Item Search Results Field -->
             </div>
         </div>
-
     </form>
+
+    <div class="row mb-2">
+        <a class="col-md-4 btn btn-success" href="{{ config('baseUrl') }}/transactions/search/sell">View Sell Orders</a>
+        <span class="col-md-4"></span>
+        <a class="col-md-4 btn btn-info" href="{{ config('baseUrl') }}/transactions/search/buy">View Buy Orders</a>
+    </div>
 
     <div class="table-responsive border">
         <table class="table table-striped table-hover">

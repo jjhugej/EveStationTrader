@@ -1,34 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
+
+@extends('layouts.app')
+
+@section('content')
 <a href="{{ url()->previous() }}"><button class="btn btn-danger">< Back</button></a>
-    <h1 class="text-center mb-5">Transactions Search View</h1>
-    <form action="{{ config('baseUrl') }}/transactions/search/show" method="GET">
-        
-        @csrf
+    <h1 class="text-center mb-5">Transactions Sell Orders View</h1>
 
-        <div class="form-group mb-0">
-            <label for="name">Search By Item Name</label> 
-            <div class="row">
-                <input class="col-sm-11" autocomplete="off" type="text" name="name" id="name" class="form-control {{$errors->has('name') ? 'border border-danger' : ''}}" value="{{ old('name') }}" placeholder="" required>
-                <input class="col btn btn-primary" type="submit" value="search">
-            </div>
-        </div>
-        
-        <div class="row container">
-            <div id="js_item_search_results_target" class="card mb-3 col-sm-11">
-                <!-- Item Search Results Field -->
-            </div>
-        </div>
-
-    </form>
-
-    <p><span class="font-italic">Currently showing results for: </span> 
-        @if($searchMatches !== null)
-         <span class="font-weight-bold">{{$searchMatches[0]->typeName}} </span></p>
-        @else
-           <span class="font-weight-bold text-danger">Item Not Found In This Character's Transaction History</span></p>
-        @endif
+   
 
     <div class="table-responsive border">
         <table class="table table-striped table-hover">
@@ -67,5 +47,8 @@
     </div>
 
     <script type="text/javascript" src="{{ asset('js/transaction_search.js') }}"></script>
+
+@endsection
+
 
 @endsection

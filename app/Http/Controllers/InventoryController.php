@@ -259,7 +259,7 @@ class InventoryController extends InventoryBaseController
         //searchRequest is the variable that comes from the ajax get request
         $searchRequest = $request->searchRequest;
         if($searchRequest !== null){
-            $searchMatches = EveItem::where('typeName', 'LIKE','%'.$searchRequest.'%')->orderByRaw('CHAR_LENGTH(typeName)')->take(30)->get();
+            $searchMatches = EveItem::where('typeName', 'LIKE','%'.$searchRequest.'%')->whereNotNull('marketGroupID')->orderByRaw('CHAR_LENGTH(typeName)')->take(30)->get();
             return view('inventory._item_search', compact('searchMatches'));
         }
     }

@@ -120,7 +120,7 @@ class TransactionsController extends TransactionsBaseController
         $searchRequest = $request->searchRequest;
 
         if($searchRequest !== null){
-            $searchMatches = EveItem::where('typeName', 'LIKE','%'.$searchRequest.'%')->orderByRaw('CHAR_LENGTH(typeName)')->take(40)->get();
+            $searchMatches = EveItem::where('typeName', 'LIKE','%'.$searchRequest.'%')->whereNotNull('marketGroupID')->take(20)->get();
             return view('transactions._transaction_search', compact('searchMatches'));
         }
     }
@@ -148,5 +148,35 @@ class TransactionsController extends TransactionsBaseController
         
         
     }
+
+
+        // TODO: FINISH SEARCH FUNCTIONALITY FOR BUY AND SELL ORDERS WITHIN TRANSACTIONS
+
+
+    public function searchSell(){
+        //sends back all sell orders within characters transaction history
+    
+        $selectedCharacter = $this->getSelectedCharacter();
+
+        $searchMatches = Transactions::where('character_id', $selectedCharacter->character_id)->where('is_buy', false)->get();
+
+        $searchMatches = $this->resolveTypeIDToItemName($searchMatches);
+
+        return view('transactions.transactions_sell', compact('searchMatches'));
+    }
+
+    public function searchBuy(){
+        //sends back all buy orders within characters transaction history
+
+        $selectedCharacter = $this->getSelectedCharacter();
+
+        $searchMatches = Transactions::where('character_id', $selectedCharacter->character_id)->where('is_buy', true)->get();
+
+        $searchMatches = $this->resolveTypeIDToItemName($searchMatches);
+
+        return view('transactions.transactions_buy', compact('searchMatches'));
+    }
+
+    
     
 }
