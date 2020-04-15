@@ -132,4 +132,78 @@ class MarketOrdersController extends MarketBaseController
     {
         //
     }
+
+    public function search($request){
+        // TODO: FINISH MARKET ORDER SEARCH FUNCTIONALITY 
+        $searchRequest = $request->searchRequest;
+
+        if($searchRequest !== null){
+            $searchMatches = EveItem::where('typeName', 'LIKE','%'.$searchRequest.'%')->whereNotNull('marketGroupID')->take(20)->get();
+            return view('market._marketOrders_search', compact('searchMatches'));
+        }
+        
+    }
+
+    public function searchSell(){
+        $currentSelectedCharacter = $this->getSelectedCharacter();
+
+        $marketOrders = MarketOrders::where('character_id', $currentSelectedCharacter->character_id)->where('is_buy_order', false)->get();
+
+        $marketOrders = $this->resolveTypeIDToItemName($marketOrders);
+
+        $marketOrders = $this->resolveStationIDToName($currentSelectedCharacter, $marketOrders);
+
+        $marketOrders = collect($marketOrders)->sortBy('typeName');
+
+        $marketOrders = $this->resolveMultipleCharacterNamesFromIDs($marketOrders);
+
+        return view('market.marketOrders_sell', compact('marketOrders'));
+    }
+
+    public function searchBuy(){
+        $currentSelectedCharacter = $this->getSelectedCharacter();
+
+        $marketOrders = MarketOrders::where('character_id', $currentSelectedCharacter->character_id)->where('is_buy_order', true)->get();
+
+        $marketOrders = $this->resolveTypeIDToItemName($marketOrders);
+
+        $marketOrders = $this->resolveStationIDToName($currentSelectedCharacter, $marketOrders);
+
+        $marketOrders = collect($marketOrders)->sortBy('typeName');
+
+        $marketOrders = $this->resolveMultipleCharacterNamesFromIDs($marketOrders);
+
+        return view('market.marketOrders_sell', compact('marketOrders'));
+    }
 }
+
+
+
+/*
+
+    public function searchSell(){
+        //sends back all sell orders within characters transaction history
+    
+        $selectedCharacter = $this->getSelectedCharacter();
+
+        $searchMatches = Transactions::where('character_id', $selectedCharacter->character_id)->where('is_buy', false)->get();
+
+        $searchMatches = $this->resolveTypeIDToItemName($searchMatches);
+
+        return view('transactions.transactions_sell', compact('searchMatches'));
+    }
+
+    public function searchBuy(){
+        //sends back all buy orders within characters transaction history
+
+        $selectedCharacter = $this->getSelectedCharacter();
+
+        $searchMatches = Transactions::where('character_id', $selectedCharacter->character_id)->where('is_buy', true)->get();
+
+        $searchMatches = $this->resolveTypeIDToItemName($searchMatches);
+
+        return view('transactions.transactions_buy', compact('searchMatches'));
+    }
+
+
+*/

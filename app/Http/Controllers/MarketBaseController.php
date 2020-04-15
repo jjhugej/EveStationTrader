@@ -51,11 +51,11 @@ class MarketBaseController extends EveBaseController
                     $resp = $client->get($character_orders_url, $auth_headers);
                     $data = json_decode($resp->getBody());
                     
-                    //update the last market fetch for the selected character
-                    
-                    
+                    //dd($data);
+
+                    //update the last market fetch for the selected character   
                     $selectedCharacter = Character::where('user_id', Auth::user()->id)->where('is_selected_character', 1)->first();
-                    $selectedCharacter->next_available_esi_market_fetch = Carbon::now()->addminutes(10)->toDateTimeString(); 
+                    $selectedCharacter->next_available_esi_market_fetch = Carbon::now()->addminutes(2)->toDateTimeString(); 
         
             
                     $selectedCharacter->save();
@@ -89,6 +89,12 @@ class MarketBaseController extends EveBaseController
                 $marketOrderInstance->user_id = Auth::user()->id;
                 $marketOrderInstance->character_id = $currentSelectedCharacter->character_id;
                 $marketOrderInstance->duration = $marketOrder->duration;
+                if(isset($marketOrder->is_buy_order)){
+
+                    $marketOrderInstance->is_buy_order = $marketOrder->is_buy_order;
+                }else{
+                    $marketOrderInstance->is_buy_order = false;
+                }
                 $marketOrderInstance->is_corporation = $marketOrder->is_corporation;
                 $marketOrderInstance->issued = $this->convertEsiDateTime($marketOrder->issued);
                 $marketOrderInstance->location_id = $marketOrder->location_id;
@@ -116,6 +122,12 @@ class MarketBaseController extends EveBaseController
                 $marketOrderInstance->user_id = Auth::user()->id;
                 $marketOrderInstance->character_id = $currentSelectedCharacter->character_id;
                 $marketOrderInstance->duration = $marketOrder->duration;
+                if(isset($marketOrder->is_buy_order)){
+
+                    $marketOrderInstance->is_buy_order = $marketOrder->is_buy_order;
+                }else{
+                    $marketOrderInstance->is_buy_order = false;
+                }
                 $marketOrderInstance->is_corporation = $marketOrder->is_corporation;
                 $marketOrderInstance->issued = $this->convertEsiDateTime($marketOrder->issued);
                 $marketOrderInstance->location_id = $marketOrder->location_id;

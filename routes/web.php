@@ -29,9 +29,13 @@ Route::get('/characters', 'Characters@index')->middleware('auth');
 Route::get('/dropcharacter/{character_id}', 'Characters@destroy')->middleware('auth');
 Route::get('/selectcharacter/{character_id}', 'Characters@store')->middleware('auth');
 
+//Market Partials
+Route::get('/marketorders/search', 'MarketOrdersController@search')->middleware('auth');
 //Market Orders
 Route::get('/marketorders', 'MarketOrdersController@index')->middleware('auth');
 Route::get('/marketorders/{marketOrder}', 'MarketOrdersController@show')->middleware('auth');
+Route::get('/marketorders/search/sell', 'MarketOrdersController@searchSell')->middleware('auth');
+Route::get('/marketorders/search/buy', 'MarketOrdersController@searchBuy')->middleware('auth');
 
 //Logistics
 Route::get('/logistics', 'LogisticsController@index')->middleware('auth');

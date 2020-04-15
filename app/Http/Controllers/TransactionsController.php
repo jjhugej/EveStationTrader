@@ -115,8 +115,6 @@ class TransactionsController extends TransactionsBaseController
     public function search(Request $request){
         //This method is used to return data from the eveitems table via the search method on the item_create view (specifically the item name input field).
         //searchRequest is the variable that comes from the ajax get request
-        
-        //TODO: hook up search feature with transactions
         $searchRequest = $request->searchRequest;
 
         if($searchRequest !== null){

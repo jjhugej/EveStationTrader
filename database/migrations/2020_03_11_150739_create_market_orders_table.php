@@ -21,7 +21,8 @@ class CreateMarketOrdersTable extends Migration
             $table->bigInteger('inventory_id')->nullable();  
             $table->bigInteger('logistics_group_id')->nullable();
             $table->integer('duration');
-            $table->boolean('is_corporation');
+            $table->boolean('is_buy_order')->nullable();
+            $table->boolean('is_corporation')->nullable();
             $table->dateTime('issued')->nullable();
             $table->bigInteger('location_id');
             $table->bigInteger('price');
