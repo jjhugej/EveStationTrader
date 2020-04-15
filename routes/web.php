@@ -34,6 +34,7 @@ Route::get('/marketorders/search', 'MarketOrdersController@search')->middleware(
 //Market Orders
 Route::get('/marketorders', 'MarketOrdersController@index')->middleware('auth');
 Route::get('/marketorders/{marketOrder}', 'MarketOrdersController@show')->middleware('auth');
+Route::get('/marketorders/search/show', 'MarketOrdersController@searchShow')->middleware('auth');
 Route::get('/marketorders/search/sell', 'MarketOrdersController@searchSell')->middleware('auth');
 Route::get('/marketorders/search/buy', 'MarketOrdersController@searchBuy')->middleware('auth');
 

@@ -1,7 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1 class="mb-4 text-center">Market Orders - Sell Orders</h1>
+    <h1 class="mb-4 text-center">Market Orders - Buy Orders</h1>
+
+    <div class="row mb-2">
+        <a class="col-md-4 btn btn-primary" href="{{ config('baseUrl') }}/marketorders/">View All Orders</a>
+        <span class="col-md-4"></span>
+        <a class="col-md-4 btn btn-info" href="{{ config('baseUrl') }}/marketorders/search/sell">View Sell Orders</a>
+    </div>
+
     <div class="table-responsive border">
         <table class="table table-striped table-hover">
             <thead>

@@ -31,7 +31,7 @@
 
     <h1 class="text-center mb-3">Items In This Shopping List:</h1>
 
-    <a href="#shoppingListItemForm"><button class="btn btn-primary mb-1">+ Add Item</button></a>
+    <a href="#shoppingListItemFormHeader"><button class="btn btn-primary mb-1">+ Add Item</button></a>
     <div class="table-responsive border mb-3">
         <table class="table table-striped table-hover">
             <thead>
@@ -57,7 +57,7 @@
         </table>
     </div>
 
-    <h2 class="text-center">Add Item To Shopping List</h2>
+    <h2 name="shoppingListItemFormHeader" id="shoppingListItemFormHeader" class="text-center">Add Item To Shopping List</h2>
     <form name="shoppingListItemForm" id="shoppingListItemForm" method="POST" action="{{ config('baseUrl') }}/shoppinglistitem/create/{{$shoppingList->id}}">
         
         @csrf

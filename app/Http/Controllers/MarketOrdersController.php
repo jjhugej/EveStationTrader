@@ -133,14 +133,38 @@ class MarketOrdersController extends MarketBaseController
         //
     }
 
-    public function search($request){
-        // TODO: FINISH MARKET ORDER SEARCH FUNCTIONALITY 
+    public function search(Request $request){
+        // TODO: FINISH MARKET ORDER SEARCH     FUNCTIONALITY 
+        
         $searchRequest = $request->searchRequest;
-
+        
         if($searchRequest !== null){
             $searchMatches = EveItem::where('typeName', 'LIKE','%'.$searchRequest.'%')->whereNotNull('marketGroupID')->take(20)->get();
             return view('market._marketOrders_search', compact('searchMatches'));
         }
+        
+    }
+    public function searchShow(Request $request){
+        //this method returns a table that mimicks the market orders->index page for a specific item in their transactions log
+     
+
+        $typeID = EveItem::where('typeName', $request->name)->pluck('typeID')->first();
+
+        if($typeID !== null){
+            $searchMatches = MarketOrders::where('type_id', $typeID)->get();
+
+            if($searchMatches->isEmpty()){
+                $searchMatches = null;
+            }else{
+                $searchMatches = $this->resolveTypeIDToItemName($searchMatches);
+            }
+        }
+        else{
+            $searchMatches = null;
+        }
+        
+        return view('market.marketOrders_search_show', compact('searchMatches'));
+        
         
     }
 
@@ -173,7 +197,7 @@ class MarketOrdersController extends MarketBaseController
 
         $marketOrders = $this->resolveMultipleCharacterNamesFromIDs($marketOrders);
 
-        return view('market.marketOrders_sell', compact('marketOrders'));
+        return view('market.marketOrders_buy', compact('marketOrders'));
     }
 }
 

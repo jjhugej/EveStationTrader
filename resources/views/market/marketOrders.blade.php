@@ -3,29 +3,29 @@
 @section('content')
     <h1 class="mb-4 text-center">Market Orders</h1>
 
-    <form action="{{ config('baseUrl') }}/transactions/search/show" method="GET">
+    <form action="{{ config('baseUrl') }}/marketorders/search/show" method="GET">
         
         @csrf
 
         <div class="form-group mb-0">
             <label for="name">Search By Item Name</label> 
             <div class="row">
-                <input class="col-sm-11" autocomplete="off" type="text" name="name" id="name" class="form-control {{$errors->has('name') ? 'border border-danger' : ''}}" value="{{ old('name') }}" placeholder="" required>
-                <input class="col btn btn-primary" type="submit" value="search">
+                <input class="col-sm-10" autocomplete="off" type="text" name="name" id="name" class="form-control {{$errors->has('name') ? 'border border-danger' : ''}}" value="{{ old('name') }}" placeholder="" required>
+                <input class="col-sm-2 btn btn-primary" type="submit" value="search">
             </div>
         </div>
         
         <div class="row container">
-            <div id="js_item_search_results_target" class="card mb-3 col-sm-11">
+            <div id="js_item_search_results_target" class="card mb-3 col-sm-10">
                 <!-- Item Search Results Field -->
             </div>
         </div>
     </form>
 
     <div class="row mb-2">
-        <a class="col-md-4 btn btn-success" href="{{ config('baseUrl') }}/marketorders/search/sell">View Sell Orders</a>
+        <a class="col-md-4 btn btn-success mb-2" href="{{ config('baseUrl') }}/marketorders/search/sell">View Sell Orders</a>
         <span class="col-md-4"></span>
-        <a class="col-md-4 btn btn-info" href="{{ config('baseUrl') }}/marketorders/search/buy">View Buy Orders</a>
+        <a class="col-md-4 btn btn-info mb-2" href="{{ config('baseUrl') }}/marketorders/search/buy">View Buy Orders</a>
     </div>
 
     <div class="table-responsive border">
@@ -59,5 +59,5 @@
         </table>
     </div>
 
-    <script type="text/javascript" src="{{ asset('js/marketOrder_search.js') }}"></script>
+    <script type="text/javascript" src="{{asset('js/marketOrder_search.js')}}"></script>
 @endsection
