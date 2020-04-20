@@ -36,11 +36,10 @@
         <table class="table table-striped table-hover">
             <thead>
                 <tr>
-                <th scope="col">Item</th>
-                <th scope="col">Purchase Price</th>
-                <th scope="col">Amount</th>
-                <th scope="col">Status</th>
-                
+                    <th scope="col">Item</th>
+                    <th scope="col">Purchase Price</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -55,6 +54,11 @@
                 @endforeach
             </tbody>
         </table>
+    </div>
+
+    <h2 class="text-center">Auto-Detect Purchases</h2>
+    <div class="container border mb-4 p-4">
+
     </div>
 
     <h2 name="shoppingListItemFormHeader" id="shoppingListItemFormHeader" class="text-center">Add Item To Shopping List</h2>

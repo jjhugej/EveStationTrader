@@ -38,4 +38,45 @@
         <a class ="col" href="/shoppinglistitem/{{$shoppingListItem->id}}/delete"><button class="btn btn-danger">Delete Item</button></a>
     </div>
 
+
+    <h2 class="text-center">Recent Transactions With This Item</h2>
+    <p>Note: This will mark the item purchased</p>
+    <form action="{{ config('baseUrl') }}/inventory/create" method="POST">
+            @csrf
+     <div class="table-responsive border">
+
+            <table id="transaction_table" class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col"></th>
+                        <th scope="col">Item</th>
+                        <th scope="col">Unit Price</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Date</th>
+                        
+
+                    </tr>
+                </thead>
+
+                
+                    <tbody>
+                        @foreach($transactions as $transaction)
+                        <tr>
+                            <td><input type="checkbox" class="transaction_checkbox" name="transaction_id_array[]" value={{$transaction->transaction_id}}></td>
+                            <td class="d-none"><input type="text" name="shoppingListItemID" value={{$shoppingListItem->id}}></td>
+                            <td>{{$transaction->typeName}}</td>
+                            <td>@formatNumber($transaction->unit_price)</td>
+                            <td>@formatNumber($transaction->quantity)</td>
+                            <td>{{date('d-M-y', strtotime($transaction->date))}}</td>
+                            <td> <a href="#">quick add</a></td>     
+                        </tr>
+                        @endforeach
+                    </tbody>
+                    
+                </table>
+            </div>
+                <input class="btn btn-success" id="submit_btn" type="submit" value="Add Items To Inventory">
+        </form>
+      
+
 @endsection

@@ -71,45 +71,11 @@ class InventoryController extends InventoryBaseController
      */
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-        'name' => 'required|max:255',
-        'purchase_price' => 'required|max:255',
-        'sell_price' => 'nullable|max:255',
-        'par' => 'integer|nullable',
-        'amount' => 'integer|nullable',
-        'taxes_paid' => 'integer|nullable',
-        'delivery_group_select' => 'nullable',
-        'current_location' => 'nullable',
-        'market_order_id_select' => 'nullable',
-        'notes' => 'nullable|max:1000',
-        ]);
-        $selectedCharacter = Character::where('user_id', Auth::user()->id)->where('is_selected_character', 1)->first();
+        //dd($request);
+        
+        $inventoryItem = $this->saveInventoryItemToDB($request);
 
-        $inventoryInstance = new Inventory();
-
-        $inventoryInstance->user_id = Auth::user()->id;
-        $inventoryInstance->character_id = $selectedCharacter->character_id;
-        $inventoryInstance->purchase_price = $validatedData['purchase_price'];
-        $inventoryInstance->name = $validatedData['name'];
-        $inventoryInstance->sell_price = $validatedData['sell_price'];
-        $inventoryInstance->par = $validatedData['par'];
-        $inventoryInstance->amount = $validatedData['amount'];
-        $inventoryInstance->taxes_paid = $validatedData['taxes_paid'];
-        $inventoryInstance->notes = $validatedData['notes'];
-        $inventoryInstance->current_location = $validatedData['current_location'];
-        if(array_key_exists('delivery_group_select', $validatedData)){
-            $inventoryInstance->logistics_group_id = $validatedData['delivery_group_select'];
-        }
-        if(array_key_exists('market_order_id_select', $validatedData)){
-            /*
-            because we store the value of every property within the value field of market_order_id_select,
-            we need to split the string into an array (delimited by a comma) and take the 0th value (which is the actual market order id)
-            */
-            $inventoryInstance->market_order_id = explode(',',$validatedData['market_order_id_select'])[0];
-        }
-
-        $inventoryInstance->save();
-        return redirect('/inventory');
+        return back();
     }
 
     /**
@@ -230,7 +196,7 @@ class InventoryController extends InventoryBaseController
      */
     public function destroy(Inventory $inventoryItem)
     {
-        //dd($inventoryItem);
+      
         $inventoryItem->delete();
         return redirect('/inventory');
     }

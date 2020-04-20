@@ -93,7 +93,16 @@ class ShoppingListItemController extends ShoppingListItemBaseController
     {
         $assignedShoppingList = ShoppingList::where('user_id', Auth::user()->id)->where('id', $shoppingListItem->shopping_list_id)->first();
     
-        return view('shoppinglistitem.shoppinglistitem_details', compact('shoppingListItem', 'assignedShoppingList'));
+        $transactions = $this->getTransactionsWithSameTypeID($shoppingListItem);
+
+        $transactions = $this->resolveTypeIDToItemName($transactions);
+
+        //dd($transactions);
+
+        // TODO: FINISH AUTOMATIC TRANSACTION DETECTION
+
+
+        return view('shoppinglistitem.shoppinglistitem_details', compact('shoppingListItem', 'assignedShoppingList','transactions'));
     }
 
     /**
@@ -105,6 +114,7 @@ class ShoppingListItemController extends ShoppingListItemBaseController
     public function edit(ShoppingListItem $shoppingListItem)
     {
        // dd($shoppingListItem);
+        
 
         return view('shoppinglistitem.shoppinglistitem_edit', compact('shoppingListItem'));
     }

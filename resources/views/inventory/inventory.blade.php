@@ -37,6 +37,7 @@
                         @endif
                         <td>{{date('d-M-y', strtotime($item->created_at))}}</td>    
                         <td> <a href="{{ config('baseUrl') }}/inventory/{{$item->id}}/edit">edit</a></td>     
+                        <td> <a href="{{ config('baseUrl') }}/inventory/{{$item->id}}/delete">delete</a></td>     
                     </tr>
                 @endforeach
             </tbody>

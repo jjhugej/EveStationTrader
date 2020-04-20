@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Character;
 use App\User;
 use App\EveItem;
+use App\Transactions;
 use App\Inventory;
 use App\StructureName;
 use Carbon\Carbon;
@@ -23,6 +24,17 @@ class ShoppingListItemBaseController extends ShoppingListBaseController
 
         EveBaseController methods are still callable since ShoppingListBaseController extends EveBaseController
     */
+
+        public function getTransactionsWithSameTypeID($shoppingListItem){
+            //This method retrieves buy order transactions that have items with the same type ID as the given shopping list item
+            $transactions = Transactions::where('user_id', Auth::user()->id)
+            ->where('type_id', $shoppingListItem->type_id)
+            ->where('is_buy', 1)
+            ->where('shopping_list_item_id', null)
+            ->get();
+            //dd($transactions);
+            return $transactions;
+        }
 
     
 }
