@@ -26,6 +26,7 @@ class CreateShoppingListItemsTable extends Migration
             $table->bigInteger('purchase_price')->nullable();
             $table->bigInteger('sell_price')->nullable();
             $table->bigInteger('amount')->nullable();
+            $table->bigInteger('amount_purchased')->nullable();
             $table->bigInteger('par')->nullable();
             $table->bigInteger('volume_per_item')->nullable();
             $table->bigInteger('taxes_paid')->nullable();

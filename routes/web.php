@@ -49,6 +49,7 @@ Route::get('/logistics/{deliveryGroup}/delete', 'LogisticsController@destroy')->
 
 //Inventory Server Partials
 Route::get('inventory/itemsearch', 'InventoryController@itemSearch');
+Route::post('inventory', 'InventoryController@inventoryFormReRoute');
 
 //Inventory
 Route::get('/inventory', 'InventoryController@index')->middleware('auth');

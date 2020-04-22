@@ -1,24 +1,17 @@
+// This file contains various functions to improve UI performance on the shopping list details page
 $(document).ready(function() {
-    $("#submit_btn").click(function() {
-        $("#transaction_table input:checkbox:checked").each(function() {
-            var selectedArray = $(this)
-                .parent()
-                .siblings()
-                .map(function() {
-                    return $(this)
-                        .text()
-                        .trim();
-                })
-                .get();
-            //console.log(selectedArray);
-
-            $.ajax({
-                url: "http://evestationtrader.test/inventory/create/",
-                data: JSON.stringify(selectedArray),
-                type: "POST"
-            }).done(function(data) {
-                console.log(data);
-            });
-        });
+    $("#status").change(function() {
+        let status = $("#status")
+            .find(":selected")
+            .text();
+        if (status == "Purchased") {
+            $("#inventoryCheckBoxWrapper")
+                .removeClass("d-none")
+                .addClass("d-block");
+        } else if (status == "Not Purchased") {
+            $("#inventoryCheckBoxWrapper")
+                .removeClass("d-block")
+                .addClass("d-none");
+        }
     });
 });

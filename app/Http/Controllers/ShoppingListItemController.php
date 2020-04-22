@@ -48,26 +48,18 @@ class ShoppingListItemController extends ShoppingListItemBaseController
         $validatedData = $request->validate([
         'name' => 'required|max:255',
         'purchase_price' => 'nullable|integer',
-        'sell_price' => 'nullable|integer',
-        'taxes_paid' => 'nullable|integer',
         'amount' => 'nullable|integer',
-        'par' => 'nullable|integer',
-        'current_location' => 'nullable',
         'status' => 'required',
         'notes' => 'nullable|max:1000',
         ]);
         
         $shoppingListItemInstance = new ShoppingListItem();
-
+            //dd($validatedData); 
         $shoppingListItemInstance->user_id = Auth::user()->id;
         $shoppingListItemInstance->shopping_list_id = $shoppingListID;
         $shoppingListItemInstance->name = $validatedData['name'];
         $shoppingListItemInstance->purchase_price = $validatedData['purchase_price'];
-        $shoppingListItemInstance->sell_price = $validatedData['sell_price'];
-        $shoppingListItemInstance->taxes_paid = $validatedData['taxes_paid'];
         $shoppingListItemInstance->amount = $validatedData['amount'];
-        $shoppingListItemInstance->par = $validatedData['par'];
-        $shoppingListItemInstance->current_location = $validatedData['current_location'];
         $shoppingListItemInstance->status = $validatedData['status'];
         $shoppingListItemInstance->notes = $validatedData['notes'];
         

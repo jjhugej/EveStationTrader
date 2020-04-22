@@ -14,6 +14,7 @@ $(document).ready(function() {
         ".item-search-button",
         function() {
             $("#name").val($(this).val());
+            $("#searchResultContainer").empty();
         }
     );
     //market order autofill fields handler

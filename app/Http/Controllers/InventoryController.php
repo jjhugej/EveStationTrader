@@ -8,6 +8,7 @@ use App\Character;
 use App\User;
 use App\MarketOrders;
 use App\EveItem;
+use App\Transactions;
 use App\StructureName;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -71,8 +72,12 @@ class InventoryController extends InventoryBaseController
      */
     public function store(Request $request)
     {
-        //dd($request);
+        //TODO CHECK IF THE REQUEST COMING IN IS FROM SHOPPING LIST ITEM AND MARK THE SHOPPING LIST ITEM AMOUNT AS 
+        //THE AMOUNT PURCHASED FROM THE TRANSACTIONS
+
+       // dd($request,$request->session(),  $request->session()->get('_previous')['url']);
         
+                
         $inventoryItem = $this->saveInventoryItemToDB($request);
 
         return back();
@@ -196,7 +201,15 @@ class InventoryController extends InventoryBaseController
      */
     public function destroy(Inventory $inventoryItem)
     {
-      
+        //remove shoppingListItemID and inventory_id from deleted inventory items' transactions
+
+        $transaction = Transactions::where('inventory_id', $inventoryItem->id)->first();
+        if($transaction !== null){
+            $transaction->shopping_list_item_id = null;
+            $transaction->inventory_id = null;
+            $transaction->save();
+        }
+
         $inventoryItem->delete();
         return redirect('/inventory');
     }
@@ -227,6 +240,86 @@ class InventoryController extends InventoryBaseController
         if($searchRequest !== null){
             $searchMatches = EveItem::where('typeName', 'LIKE','%'.$searchRequest.'%')->whereNotNull('marketGroupID')->orderByRaw('CHAR_LENGTH(typeName)')->take(30)->get();
             return view('inventory._item_search', compact('searchMatches'));
+        }
+    }
+
+    public function merge(Request $request){
+        //dd('merge method', $request);
+        $inventoryItemIDArray = $request->input('inventory_item_id_array');
+
+        $typeIDCheck = null;
+        $logisticsGroupID = null;
+        $totalPurchasePrice = 0;
+        $totalSellPrice = 0;
+        $totalAmount = 0;
+        $totalPar = 0;
+        $totalTaxesPaid = 0;
+       
+        foreach($inventoryItemIDArray as $inventoryID){
+
+            $inventoryItem = Inventory::where('id', $inventoryID)->first();
+
+            if($typeIDCheck == null){
+                $typeIDCheck = $inventoryItem->type_id;
+            }
+            if($inventoryItem->type_id !== $typeIDCheck){
+                //if this check is true the item types are different and cannot be merged
+
+                //return error
+
+            }else{
+                $logisticsGroupID = $inventoryItem->logistics_group_id;
+                $totalPurchasePrice += $inventoryItem->purchase_price;
+                $totalSellPrice += $inventoryItem->sell_price;
+                $totalAmount += $inventoryItem->amount;
+                $totalPar += $inventoryItem->par;
+                $totalTaxesPaid += $inventoryItem->taxes_paid;
+
+                $inventoryItem->delete();
+            }
+            
+
+            //dd('merge method', $inventoryItem);
+        }
+
+        $mergedInventoryItem = new Inventory();
+        $mergedInventoryItem->user_id = Auth::user()->id;
+        $mergedInventoryItem->character_id = $this->getSelectedCharacter()->character_id;
+        $mergedInventoryItem->type_id = $typeIDCheck;
+        $mergedInventoryItem->name = $this->resolveSingleTypeIDToItemName($typeIDCheck);
+        $mergedInventoryItem->logistics_group_id = $logisticsGroupID;
+        $mergedInventoryItem->purchase_price = $totalPurchasePrice;
+        $mergedInventoryItem->sell_price = $totalSellPrice;
+        $mergedInventoryItem->amount = $totalAmount;
+        $mergedInventoryItem->par = $totalPar;
+        $mergedInventoryItem->taxes_paid = $totalTaxesPaid;
+        $mergedInventoryItem->notes = 'Merged from multiple inventory items';
+
+        $mergedInventoryItem->save();
+
+        return $mergedInventoryItem;
+
+    }
+    public function updatetransaction($mergedInventoryItem){
+        dd($mergedInventoryItem);
+    }
+
+    public function inventoryFormReRoute(Request $request){
+        //dd($request);
+        switch($request->input('action')){
+            case 'merge':
+                $mergedInventoryItem = $this->merge($request);
+                $this->updatetransaction($mergedInventoryItem);
+                return back();
+            break;
+            
+            case 'delete':
+                dd('delete', $request->input('inventory_item_id_array'));
+                //delete
+
+                //TODO: IMPLEMENT MULTI-DELETE FUNCTIONALITY FOR INVENTORY ITEMS-- ALSO CHECK TO MAKE SURE 
+                //DIFFERENT TYPE IDS CANNOT BE MERGED
+            break;
         }
     }
 

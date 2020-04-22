@@ -7,6 +7,7 @@ use App\Logistics;
 use App\Character;
 use App\User;
 use App\MarketOrders;
+use App\ShoppingListItem;
 use App\EveItem;
 use App\Transactions;
 use App\StructureName;
@@ -45,50 +46,67 @@ class InventoryBaseController extends EveBaseController
     }
 
     public function saveInventoryItemToDB($request){
-       // dd($request,$request->shoppingListItemID);
         $selectedCharacter = $this->getSelectedCharacter();
       
         if(isset($request->transaction_id_array)){
+            /*
+                if the request has the property transaction_id_array we need to run logic to get 
+                the proper data from the transaction_ID.
+                transaction_id_array also means that the request is coming from the shopping list item page
+            */
+            //dd($request->transaction_id_array);
+            $totalTransactionQuantity = 0;
+            $totalTransactionPurchasePrice = 0;
 
-            //if the request has the property transaction_id_array we need to run logic to get the proper data from the transaction_ID
-          
+
            foreach($request->transaction_id_array as $transaction_id){
                
-            $transaction = Transactions::where('transaction_id', $transaction_id)->get();
-            
-                //next we have to update the transaction with the shopping list item id to attach the two
+                $transaction = Transactions::where('transaction_id', $transaction_id)->get();               
 
-               $transaction->first()->shopping_list_item_id = $request->shoppingListItemID;
+                $transaction = $this->resolveTypeIDToItemName($transaction)->first();
                
-               $transaction->first()->save();
-               $transaction = $this->resolveTypeIDToItemName($transaction)->first();
-                            
-               $inventoryInstance = new Inventory();
-               $inventoryInstance->user_id = Auth::user()->id;
-               $inventoryInstance->character_id = $selectedCharacter->character_id;
-               $inventoryInstance->name = $transaction->typeName;
-               $inventoryInstance->type_id = $transaction->type_id;
-               $inventoryInstance->amount = $transaction->quantity;
-               $inventoryInstance->purchase_price = $transaction->unit_price;
 
-               if(isset($request->shoppingListItemID)){
-                  
-                   //if the request comes with shoppinglistitemID save it to the inventory instance
-                   $inventoryInstance->shopping_list_item_id = $request->shoppingListItemID;
-                }
-               
-               $inventoryInstance->save();
+                $inventoryInstance = new Inventory();
+                $inventoryInstance->user_id = Auth::user()->id;
+                $inventoryInstance->character_id = $selectedCharacter->character_id;
+                $inventoryInstance->name = $transaction->typeName;
+                $inventoryInstance->type_id = $transaction->type_id;
+                $inventoryInstance->amount = $transaction->quantity;
+                $inventoryInstance->purchase_price = $transaction->unit_price;
+                if(isset($request->shoppingListItemID)){
+                    $inventoryInstance->shopping_list_item_id = $request->shoppingListItemID;
+                 }
+    
+                 $inventoryInstance->save();
+                // dd($inventoryInstance->id);
+                //next we have to update the transaction with the shopping list item id to attach the tw   
+                $transaction->shopping_list_item_id = $request->shoppingListItemID;
+                $transaction->inventory_id = $inventoryInstance->id;
+                unset($transaction->typeName);
+                $transaction->save();
 
-                    
-     
+                 //update initialized variables with purchase price and quantity
+                $totalTransactionQuantity += $transaction->quantity;
+                $totalTransactionPurchasePrice += $transaction->unit_price;
+                
+
            }
+           $shoppingListItem = ShoppingListitem::where('id', $request->shoppingListItemID)->first();
+           $shoppingListItem->amount_purchased = $totalTransactionQuantity;
+           $shoppingListItem->purchase_price = $totalTransactionPurchasePrice;
 
+           $shoppingListItem->save();
+           //dd($totalTransactionQuantity, $totalTransactionPurchasePrice , $shoppingListItem);
+
+        }elseif(!isset($request->name) && !isset($request->transaction_id_array)){
+            /*
+                if neither of these are set it means the user clicked the submit form 
+                on the shoppinglistitem page without actually selecting a transaction to link
+            */
+            return back();
         }
         else{
-            dd('saveInventoryItemToDB','else');
-
             //else we validate and save the data normally
- 
             $validatedData = $request->validate([
             'name' => 'required|max:255',
             'purchase_price' => 'nullable|max:255',

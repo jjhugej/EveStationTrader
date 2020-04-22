@@ -246,6 +246,12 @@ class EveBaseController extends Controller
             return $eveObjectDatas;
     }
 
+    public function resolveSingleTypeIDToItemName($typeID){
+        $typeName = EveItem::where('typeID', $typeID)->pluck('typeName')->first();
+        
+        return $typeName;
+    }
+
 
     public function resolveSingleItemNameToTypeID($eveObjectData){
         $typeID = EveItem::where('typeName', $eveObjectData->name)->pluck('typeID')->first();
