@@ -105,7 +105,7 @@ class InventoryBaseController extends EveBaseController
             
             
             $inventoryInstance = new Inventory();
-                //TODO: RESOLVE TYPE_ID FROM NAME
+
             $inventoryInstance->user_id = Auth::user()->id;
             $inventoryInstance->character_id = $selectedCharacter->character_id;
             $inventoryInstance->purchase_price = $validatedData['purchase_price'];

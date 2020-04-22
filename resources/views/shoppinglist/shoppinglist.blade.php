@@ -4,7 +4,7 @@
 
     <h1 class="text-center mb-5">Shopping Lists Overview</h1>
 
-    <a href="/shoppinglist/create"><button type="button" class="btn btn-success mb-2">+ Add New Shopping List </button></a>
+    <a href="/shoppinglist/create"><button type="button" class="btn btn-success mb-2">+ Create New Shopping List </button></a>
     <div class="table-responsive border">
         <table class="table table-striped table-hover">
             <thead>
