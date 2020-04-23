@@ -8,6 +8,7 @@ use App\Character;
 use App\User;
 use App\MarketOrders;
 use App\EveItem;
+use App\ShoppingListItem;
 use App\Transactions;
 use App\StructureName;
 use Carbon\Carbon;
@@ -203,12 +204,25 @@ class InventoryController extends InventoryBaseController
     {
         //remove shoppingListItemID and inventory_id from deleted inventory items' transactions
 
-        $transaction = Transactions::where('inventory_id', $inventoryItem->id)->first();
-        if($transaction !== null){
-            $transaction->shopping_list_item_id = null;
-            $transaction->inventory_id = null;
-            $transaction->save();
-        }
+         $inventoryItem = Inventory::where('id', $inventoryItem->id)->first();
+
+
+            //delete the inventory id from its respective transaction
+            $associatedTransaction = Transactions::where('inventory_id', $inventoryItem->id)->first();
+
+            if($associatedTransaction !== null || $associatedTransaction !== 0){
+                $associatedTransaction->inventory_id = 0;
+                $associatedTransaction->save();
+            }
+
+            //update the purchase price and amount purchased for the related shopping list item
+            $associatedShoppingListItem = ShoppingListItem:: where('id', $inventoryItem->shopping_list_item_id)->first();
+
+            if($associatedShoppingListItem !== null || $associatedShoppingListItem !== 0){
+                $associatedShoppingListItem->purchase_price -= $inventoryItem->purchase_price;
+                $associatedShoppingListItem->amount_purchased -= $inventoryItem->amount;
+                $associatedShoppingListItem->save();
+            }
 
         $inventoryItem->delete();
         return redirect('/inventory');
@@ -301,7 +315,7 @@ class InventoryController extends InventoryBaseController
 
     }
     public function updatetransaction($mergedInventoryItem){
-        dd($mergedInventoryItem);
+        dd('updateTransaction on incentory controller',$mergedInventoryItem);
     }
 
     public function inventoryFormReRoute(Request $request){
@@ -320,18 +334,27 @@ class InventoryController extends InventoryBaseController
                 foreach($request->input('inventory_item_id_array') as $inventoryItemID){
                     $inventoryItem = Inventory::where('id', $inventoryItemID)->first();
 
+
                     //delete the inventory id from its respective transaction
-                    $associatedTransaction = Transaction::where('inventory_id', $inventoryItemID)->first();
-                    $associatedTransaction->inventory_id = null;
+                    $associatedTransaction = Transactions::where('inventory_id', $inventoryItemID)->first();
+                 
+                    $associatedTransaction->inventory_id = 0;
 
                     $associatedTransaction->save();
+
+                    //update the purchase price and amount purchased for the related shopping list item
+                    $associatedShoppingListItem = ShoppingListItem:: where('id', $inventoryItem->shopping_list_item_id)->first();
+                    $associatedShoppingListItem->purchase_price -= $inventoryItem->purchase_price;
+                    $associatedShoppingListItem->amount_purchased -= $inventoryItem->amount;
+
+                    $associatedShoppingListItem->save();
                     
                     $inventoryItem->delete();
                 }
                 return back();
 
-                //TODO: IMPLEMENT MULTI-DELETE FUNCTIONALITY FOR INVENTORY ITEMS-- ALSO CHECK TO MAKE SURE 
-                //DIFFERENT TYPE IDS CANNOT BE MERGED
+                //TODO: UPDATE SHOPPINGLIST ITEM PURCHASE AMOUNT AND PURCHASE PRICE ON DELETION OF INVENTORY ITEMS
+                //REMEMBER TO UPDATE FOR SINGLE DESTROY AS WELL
             break;
         }
     }

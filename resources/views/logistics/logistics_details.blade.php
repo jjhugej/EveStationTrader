@@ -68,7 +68,7 @@
                     </form>
                     @endforeach
             </tbody>
-        </table>
     </div>
+    </table>
 
 @endsection

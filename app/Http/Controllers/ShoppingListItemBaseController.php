@@ -30,8 +30,8 @@ class ShoppingListItemBaseController extends ShoppingListBaseController
             $transactions = Transactions::where('user_id', Auth::user()->id)
             ->where('type_id', $shoppingListItem->type_id)
             ->where('is_buy', 1)
-            ->where('shopping_list_item_id', null)
-            ->orWhere('shopping_list_item_id', 0)
+            ->where('inventory_id', null)
+            ->orWhere('inventory_id', 0)
             ->orderBy('date', 'desc')
             ->get();
             //dd($transactions);

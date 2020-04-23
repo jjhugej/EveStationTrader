@@ -31,43 +31,27 @@
             </div>
         </div>
         <div class="form-row">
-            <div class="col">
+            <div class="form-group col">
                 <label for="purchase_price">Purchase Price:</label>
                 <input type="number" name="purchase_price" id ="purchase_price" class="form-control {{$errors->has('purchase_price') ? 'border border-danger' : ''}}" value="{{ $shoppingListItem->purchase_price}}" placeholder="">
             </div>
-            <div class="col">
-                <label for="sell_price">Sell Price:</label>
-                <input type="number" name="sell_price" id = "sell_price" class="form-control {{$errors->has('sell_price') ? 'border border-danger' : ''}}" value="{{ $shoppingListItem->sell_price }}" placeholder="">
-            </div>
-            <div class="form-group col">
-                <label for="taxes_paid">Taxes Paid:</label>
-                <input type="number" name="taxes_paid" id="taxes_paid" class="form-control {{$errors->has('taxes_paid') ? 'border border-danger' : ''}}" value="{{ $shoppingListItem->taxes_paid }}" placeholder="">
-            </div>
-        </div>
-        <div class="form-row">
+        
             <div class="form-group col">
                 <label for="amount">Amount:</label>
                 <input type="number" name="amount" id="amount" class="form-control {{$errors->has('amount') ? 'border border-danger' : ''}}" value="{{ $shoppingListItem->amount }}" placeholder="">
             </div>
-            <div class="form-group col">
-                <label for="par">Par:</label>
-                <input type="number" name="par" id="par" class="form-control {{$errors->has('par') ? 'border border-danger' : ''}}" value="{{ $shoppingListItem->par }}" placeholder="">
-            </div>
         </div>
-        <div class="form-group">
-                <label for="current_location">Current Location:</label>
-                <input type="text" name="current_location" id="current_location" class="form-control {{$errors->has('current_location') ? 'border border-danger' : ''}}" value="{{ $shoppingListItem->current_location }}" placeholder="">
-            </div>
             <div class="form-group">
             <label for="status" class="my-1 mr-2">Status:</label>
             <select name="status" id="status" class="custom-select my-1 mr-sm-2">
                 <option value="Not Purchased">Not Purchased</option>
+                <option value="Partially Purchased">Partially Purchased</option>
                 <option value="Purchased">Purchased</option>
             </select>
-            <div class="form-check">
+            <div id="inventoryCheckBoxWrapper" class="form-check mb-2 d-none">
                 <input type="checkbox" class="form-check-input" name="inventoryCheckBox" id="inventoryCheckBox">
                 <label class="form-check-label" for="inventoryCheckBox">Add item to inventory?</label>
-            </div>
+        </div>
         </div>
         <div class="form-group">
             <label for="notes">Notes:</label>
@@ -78,5 +62,6 @@
     </form>
 
     <script type="text/javascript" src="{{ asset('js/item_search.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/shopping_list_item_add.js') }}"></script>
 
 @endsection

@@ -86,6 +86,7 @@
             <label for="status" class="my-1 mr-2">Status:</label>
             <select name="status" id="status" class="custom-select my-1 mr-sm-2">
                 <option value="Not Purchased">Not Purchased</option>
+                <option value="Partially Purchased">Partially Purchased</option>
                 <option value="Purchased">Purchased</option>
             </select>
         </div>

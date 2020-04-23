@@ -7,6 +7,7 @@ use App\Logistics;
 use App\Character;
 use App\User;
 use App\MarketOrders;
+use App\ShoppingList;
 use App\ShoppingListItem;
 use App\EveItem;
 use App\Transactions;
@@ -74,7 +75,12 @@ class InventoryBaseController extends EveBaseController
                 $inventoryInstance->amount = $transaction->quantity;
                 $inventoryInstance->purchase_price = $transaction->unit_price;
                 if(isset($request->shoppingListItemID)){
+
                     $inventoryInstance->shopping_list_item_id = $request->shoppingListItemID;
+                    $shoppingListItem = ShoppingListItem::where('id', $request->shoppingListItemID)->first();
+                    $shoppingList = ShoppingList::where('id', $shoppingListItem->shopping_list_id)->first();
+                    $inventoryInstance->notes = 'Added from shopping list item ' . $shoppingListItem->name .
+                     ' from the shopping list ' . $shoppingList->name;
                  }
     
                  $inventoryInstance->save();
@@ -103,7 +109,7 @@ class InventoryBaseController extends EveBaseController
            }
 
            $shoppingListItem->save();
-           //dd($totalTransactionQuantity, $totalTransactionPurchasePrice , $shoppingListItem);
+           
 
         }elseif(!isset($request->name) && !isset($request->transaction_id_array)){
             /*
