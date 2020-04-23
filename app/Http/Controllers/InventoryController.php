@@ -81,7 +81,7 @@ class InventoryController extends InventoryBaseController
                 
         $inventoryItem = $this->saveInventoryItemToDB($request);
 
-        return back();
+        return redirect('/inventory');
     }
 
     /**
@@ -210,7 +210,8 @@ class InventoryController extends InventoryBaseController
             //delete the inventory id from its respective transaction
             $associatedTransaction = Transactions::where('inventory_id', $inventoryItem->id)->first();
 
-            if($associatedTransaction !== null || $associatedTransaction !== 0){
+            if($associatedTransaction !== null && $associatedTransaction !== 0){
+                //dd($associatedTransaction == null);
                 $associatedTransaction->inventory_id = 0;
                 $associatedTransaction->save();
             }
@@ -218,7 +219,7 @@ class InventoryController extends InventoryBaseController
             //update the purchase price and amount purchased for the related shopping list item
             $associatedShoppingListItem = ShoppingListItem:: where('id', $inventoryItem->shopping_list_item_id)->first();
 
-            if($associatedShoppingListItem !== null || $associatedShoppingListItem !== 0){
+            if($associatedShoppingListItem !== null && $associatedShoppingListItem !== 0){
                 $associatedShoppingListItem->purchase_price -= $inventoryItem->purchase_price;
                 $associatedShoppingListItem->amount_purchased -= $inventoryItem->amount;
                 $associatedShoppingListItem->save();
@@ -257,64 +258,9 @@ class InventoryController extends InventoryBaseController
         }
     }
 
-    public function merge(Request $request){
-        //dd('merge method', $request);
-        $inventoryItemIDArray = $request->input('inventory_item_id_array');
+    public function updateMergedtransaction($mergedInventoryItem){
 
-        $typeIDCheck = null;
-        $logisticsGroupID = null;
-        $totalPurchasePrice = 0;
-        $totalSellPrice = 0;
-        $totalAmount = 0;
-        $totalPar = 0;
-        $totalTaxesPaid = 0;
-       
-        foreach($inventoryItemIDArray as $inventoryID){
-
-            $inventoryItem = Inventory::where('id', $inventoryID)->first();
-
-            if($typeIDCheck == null){
-                $typeIDCheck = $inventoryItem->type_id;
-            }
-            if($inventoryItem->type_id !== $typeIDCheck){
-                //if this check is true the item types are different and cannot be merged
-
-                //return error
-
-            }else{
-                $logisticsGroupID = $inventoryItem->logistics_group_id;
-                $totalPurchasePrice += $inventoryItem->purchase_price;
-                $totalSellPrice += $inventoryItem->sell_price;
-                $totalAmount += $inventoryItem->amount;
-                $totalPar += $inventoryItem->par;
-                $totalTaxesPaid += $inventoryItem->taxes_paid;
-
-                $inventoryItem->delete();
-            }
-            
-
-            //dd('merge method', $inventoryItem);
-        }
-
-        $mergedInventoryItem = new Inventory();
-        $mergedInventoryItem->user_id = Auth::user()->id;
-        $mergedInventoryItem->character_id = $this->getSelectedCharacter()->character_id;
-        $mergedInventoryItem->type_id = $typeIDCheck;
-        $mergedInventoryItem->name = $this->resolveSingleTypeIDToItemName($typeIDCheck);
-        $mergedInventoryItem->logistics_group_id = $logisticsGroupID;
-        $mergedInventoryItem->purchase_price = $totalPurchasePrice;
-        $mergedInventoryItem->sell_price = $totalSellPrice;
-        $mergedInventoryItem->amount = $totalAmount;
-        $mergedInventoryItem->par = $totalPar;
-        $mergedInventoryItem->taxes_paid = $totalTaxesPaid;
-        $mergedInventoryItem->notes = 'Merged from multiple inventory items';
-
-        $mergedInventoryItem->save();
-
-        return $mergedInventoryItem;
-
-    }
-    public function updatetransaction($mergedInventoryItem){
+        //TODO: FINISH MERGE CAPABILITIES FOR INVENTORY ITEMS OF THE SAME TYPE ID-- SEE ABOVE FOR PRIOR WORK
         dd('updateTransaction on incentory controller',$mergedInventoryItem);
     }
 
@@ -324,37 +270,52 @@ class InventoryController extends InventoryBaseController
 
             case 'merge':
                 $mergedInventoryItem = $this->merge($request);
-                $this->updatetransaction($mergedInventoryItem);
+                //NOTE TO SELF:MAKE SURE ONLY ONE INVENTORY ITEM CANNOT BE MERGED
+                //$this->updatetransaction($mergedInventoryItem);
                 return back();
             break;
             
             case 'delete':
                 //dd('delete', $request->input('inventory_item_id_array'));
-                
-                foreach($request->input('inventory_item_id_array') as $inventoryItemID){
-                    $inventoryItem = Inventory::where('id', $inventoryItemID)->first();
+                //NOTE TO SELF:MAKE SURE ONLY ONE INVENTORY ITEM CANNOT BE MERGED
+                if($request->has('inventory_item_id_array') == true ){
+                    foreach($request->input('inventory_item_id_array') as $inventoryItemID){
+                        $inventoryItem = Inventory::where('id', $inventoryItemID)->first();
+    
+    
+                        //delete the inventory id from its respective transaction
+                        $associatedTransaction = Transactions::where('inventory_id', $inventoryItemID)->first();
 
+                        if($associatedTransaction !== null && $associatedTransaction !== 0){
+                            $associatedTransaction->inventory_id = 0;
+        
+                            $associatedTransaction->save();
+                        }
+    
+                        //update the purchase price and amount purchased for the related shopping list item
+                        $associatedShoppingListItem = ShoppingListItem:: where('id', $inventoryItem->shopping_list_item_id)->first();
+                        if($associatedShoppingListItem !== null && $associatedShoppingListItem !== 0){
+                            $associatedShoppingListItem->purchase_price -= $inventoryItem->purchase_price;
+                            $associatedShoppingListItem->amount_purchased -= $inventoryItem->amount;
+        
+                            $associatedShoppingListItem->save();
+                        }
+                        
+                        $inventoryItem->delete();
+                    }
+                    return back();
+                }else{
+                    //else the array is empty and the user needs to pick atleast 1 item to delete
+                    //THIS IS DIFFERENT THAN THE MERGE, BECAUSE THE USER ONLY NEEDS TO PICK ONE ITEM
+                    //NOTE TO SELF---
 
-                    //delete the inventory id from its respective transaction
-                    $associatedTransaction = Transactions::where('inventory_id', $inventoryItemID)->first();
-                 
-                    $associatedTransaction->inventory_id = 0;
+                    //else the request did not have any items selected and should be returned back with an error message
 
-                    $associatedTransaction->save();
+                    $request->session()->flash('error', 'You must select at least one item to delete');
 
-                    //update the purchase price and amount purchased for the related shopping list item
-                    $associatedShoppingListItem = ShoppingListItem:: where('id', $inventoryItem->shopping_list_item_id)->first();
-                    $associatedShoppingListItem->purchase_price -= $inventoryItem->purchase_price;
-                    $associatedShoppingListItem->amount_purchased -= $inventoryItem->amount;
-
-                    $associatedShoppingListItem->save();
-                    
-                    $inventoryItem->delete();
+                    return back();
                 }
-                return back();
 
-                //TODO: UPDATE SHOPPINGLIST ITEM PURCHASE AMOUNT AND PURCHASE PRICE ON DELETION OF INVENTORY ITEMS
-                //REMEMBER TO UPDATE FOR SINGLE DESTROY AS WELL
             break;
         }
     }

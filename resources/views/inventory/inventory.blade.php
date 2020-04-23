@@ -2,6 +2,13 @@
 
 @section('content')
     <h1 class="text-center mb-5">Inventory Overview</h1>
+
+    @if (session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
+
     <a href="/inventory/create"><button type="button" class="btn btn-success mb-1">+ Add Item </button></a>
     
     <form action="{{ config('baseUrl') }}/inventory" method="POST">

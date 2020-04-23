@@ -110,11 +110,14 @@ class InventoryBaseController extends EveBaseController
 
            $shoppingListItem->save();
            
+           return back();
 
         }elseif(!isset($request->name) && !isset($request->transaction_id_array)){
             /*
                 if neither of these are set it means the user clicked the submit form 
                 on the shoppinglistitem page without actually selecting a transaction to link
+                ////////
+                NOTE TO SELF: return error message
             */
             return back();
         }
@@ -162,6 +165,76 @@ class InventoryBaseController extends EveBaseController
         }
 
         return $inventoryInstance;
+
+    }
+    public function merge(Request $request){
+        //dd('merge method', $request);
+        // NOTE TO SELF: CHECK THAT ATLEAST TWO ITEMS ARE IN THE ID ARRAY 
+        
+        if($request->has('inventory_item_id_array') == true){
+            
+            $inventoryItemIDArray = $request->input('inventory_item_id_array');
+    
+            $typeIDCheck = null;
+            $logisticsGroupID = null;
+            $totalPurchasePrice = 0;
+            $totalSellPrice = 0;
+            $totalAmount = 0;
+            $totalPar = 0;
+            $totalTaxesPaid = 0;
+           
+            foreach($inventoryItemIDArray as $inventoryID){
+    
+                $inventoryItem = Inventory::where('id', $inventoryID)->first();
+    
+                if($typeIDCheck == null){
+                    $typeIDCheck = $inventoryItem->type_id;
+                }
+                if($inventoryItem->type_id !== $typeIDCheck){
+                    //if this check is true the item types are different and cannot be merged
+                   
+                    $request->session()->flash('error', 'You can only merge items of the same type');
+    
+                    return back();
+                    //return error
+    
+                }else{
+                    $logisticsGroupID = $inventoryItem->logistics_group_id;
+                    $totalPurchasePrice += $inventoryItem->purchase_price;
+                    $totalSellPrice += $inventoryItem->sell_price;
+                    $totalAmount += $inventoryItem->amount;
+                    $totalPar += $inventoryItem->par;
+                    $totalTaxesPaid += $inventoryItem->taxes_paid;
+    
+                    $inventoryItem->delete();
+                }
+                
+    
+                //dd('merge method', $inventoryItem);
+            }
+    
+            $mergedInventoryItem = new Inventory();
+            $mergedInventoryItem->user_id = Auth::user()->id;
+            $mergedInventoryItem->character_id = $this->getSelectedCharacter()->character_id;
+            $mergedInventoryItem->type_id = $typeIDCheck;
+            $mergedInventoryItem->name = $this->resolveSingleTypeIDToItemName($typeIDCheck);
+            $mergedInventoryItem->logistics_group_id = $logisticsGroupID;
+            $mergedInventoryItem->purchase_price = $totalPurchasePrice;
+            $mergedInventoryItem->sell_price = $totalSellPrice;
+            $mergedInventoryItem->amount = $totalAmount;
+            $mergedInventoryItem->par = $totalPar;
+            $mergedInventoryItem->taxes_paid = $totalTaxesPaid;
+            $mergedInventoryItem->notes = 'Merged from multiple inventory items';
+    
+            $mergedInventoryItem->save();
+    
+            return $mergedInventoryItem;
+        }else{
+            //else the request did not have any items selected and should be returned back with an error message
+            $request->session()->flash('error', 'You must select at least two of the same items to merge');
+
+            return back();
+        }
 
     }
 }   
