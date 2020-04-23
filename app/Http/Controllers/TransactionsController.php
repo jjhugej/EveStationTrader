@@ -118,7 +118,7 @@ class TransactionsController extends TransactionsBaseController
         $searchRequest = $request->searchRequest;
 
         if($searchRequest !== null){
-            $searchMatches = EveItem::where('typeName', 'LIKE','%'.$searchRequest.'%')->whereNotNull('marketGroupID')->take(20)->get();
+            $searchMatches = EveItem::where('typeName', 'LIKE','%'.$searchRequest.'%')->whereNotNull('marketGroupID')->orderByRaw('CHAR_LENGTH(typeName)')->take(20)->get();
             return view('transactions._transaction_search', compact('searchMatches'));
         }
     }

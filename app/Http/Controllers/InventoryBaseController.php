@@ -78,11 +78,12 @@ class InventoryBaseController extends EveBaseController
                  }
     
                  $inventoryInstance->save();
-                // dd($inventoryInstance->id);
-                //next we have to update the transaction with the shopping list item id to attach the tw   
+               
+                //next we have to update the transaction with the shopping list item id to attach the two 
                 $transaction->shopping_list_item_id = $request->shoppingListItemID;
                 $transaction->inventory_id = $inventoryInstance->id;
                 unset($transaction->typeName);
+
                 $transaction->save();
 
                  //update initialized variables with purchase price and quantity
@@ -92,8 +93,14 @@ class InventoryBaseController extends EveBaseController
 
            }
            $shoppingListItem = ShoppingListitem::where('id', $request->shoppingListItemID)->first();
-           $shoppingListItem->amount_purchased = $totalTransactionQuantity;
-           $shoppingListItem->purchase_price = $totalTransactionPurchasePrice;
+           $shoppingListItem->amount_purchased += $totalTransactionQuantity;
+           $shoppingListItem->purchase_price += $totalTransactionPurchasePrice;
+           if($shoppingListItem->amount <= $shoppingListItem->amount_purchased ){
+                $shoppingListItem->status = 'Purchased';
+           }else{
+
+               $shoppingListItem->status = 'Partially Purchased';
+           }
 
            $shoppingListItem->save();
            //dd($totalTransactionQuantity, $totalTransactionPurchasePrice , $shoppingListItem);

@@ -305,8 +305,9 @@ class InventoryController extends InventoryBaseController
     }
 
     public function inventoryFormReRoute(Request $request){
-        //dd($request);
+
         switch($request->input('action')){
+
             case 'merge':
                 $mergedInventoryItem = $this->merge($request);
                 $this->updatetransaction($mergedInventoryItem);
@@ -314,8 +315,20 @@ class InventoryController extends InventoryBaseController
             break;
             
             case 'delete':
-                dd('delete', $request->input('inventory_item_id_array'));
-                //delete
+                //dd('delete', $request->input('inventory_item_id_array'));
+                
+                foreach($request->input('inventory_item_id_array') as $inventoryItemID){
+                    $inventoryItem = Inventory::where('id', $inventoryItemID)->first();
+
+                    //delete the inventory id from its respective transaction
+                    $associatedTransaction = Transaction::where('inventory_id', $inventoryItemID)->first();
+                    $associatedTransaction->inventory_id = null;
+
+                    $associatedTransaction->save();
+                    
+                    $inventoryItem->delete();
+                }
+                return back();
 
                 //TODO: IMPLEMENT MULTI-DELETE FUNCTIONALITY FOR INVENTORY ITEMS-- ALSO CHECK TO MAKE SURE 
                 //DIFFERENT TYPE IDS CANNOT BE MERGED
