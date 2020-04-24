@@ -16,6 +16,8 @@ use GuzzleHttp\Exception\ServerException;
 
 class MarketOrdersController extends MarketBaseController
 
+//TODO: ALLOW THE ADDITION OF ITEMS FROM MARKET ORDERS TO INVENTORY ITEMS
+
 {
     /**
      * Display a listing of the resource.

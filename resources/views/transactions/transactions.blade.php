@@ -2,6 +2,27 @@
 
 @section('content')
 
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+    @if(Session::has('error'))
+        <div class="alert alert-danger">
+        {{ Session::get('error')}}
+        </div>
+    @endif
+    
+    @if(Session::has('status'))
+        <div class="alert alert-success">
+        {{ Session::get('status')}}
+        </div>
+    @endif
+
     <h1 class="text-center mb-5">Transactions</h1>
     <form action="{{ config('baseUrl') }}/transactions/search/show" method="GET">
         
@@ -28,39 +49,48 @@
         <a class="col-md-4 btn btn-info" href="{{ config('baseUrl') }}/transactions/search/buy">View Buy Orders</a>
     </div>
 
-    <div class="table-responsive border">
-        <table class="table table-striped table-hover">
-            <thead>
-                <tr>
-                    <th scope="col">Item</th>
-                    <th scope="col">Unit Price</th>
-                    <th scope="col">Quantity</th>
-                    <th scope="col">Order Type</th>
-                    <th scope="col">Date</th>
-                    
+    <form action="{{ config('baseUrl') }}/inventory/create" method="POST">
 
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($transactionHistory as $transactionHistory)
-                    <tr>
-                        <td>{{$transactionHistory->typeName}}</td>
-                        <td>@formatNumber($transactionHistory->unit_price)</td>
-                        <td>@formatNumber($transactionHistory->quantity)</td>
-                
-                        @if($transactionHistory->is_buy == 0)
-                            <td>Sell</td>
-                        @else
-                            <td>Buy</td>
-                        @endif
+            @csrf
+
+            <div id="transactionsTableWrapper" class="table-responsive border">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th scope="col">Item</th>
+                            <th scope="col">Unit Price</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Order Type</th>
+                            <th scope="col">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($transactionHistory as $transactionHistory)
+                            <tr>
+                                @if($transactionHistory->is_buy !== 0)
+                                    <td><input type="checkbox" class="transaction_checkbox" name="transaction_id_array[]" value={{$transactionHistory->transaction_id}}></td>
+                                    @else
+                                    <td></td>
+                                @endif
+                                <td>{{$transactionHistory->typeName}}</td>
+                                <td>@formatNumber($transactionHistory->unit_price)</td>
+                                <td>@formatNumber($transactionHistory->quantity)</td>
                         
-                        <td>{{date('d-M-y', strtotime($transactionHistory->date))}}</td>
-                        <td> <a href="#">edit</a></td>     
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
+                                @if($transactionHistory->is_buy == 0)
+                                    <td>Sell</td>
+                                @else
+                                    <td>Buy</td>
+                                @endif
+                                
+                                <td>{{date('d-M-y', strtotime($transactionHistory->date))}}</td>  
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            <input class="btn btn-success" id="submit_btn" type="submit" value="Add Items To Inventory">
+    </form>
 
     <script type="text/javascript" src="{{ asset('js/transaction_search.js') }}"></script>
 

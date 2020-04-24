@@ -2,15 +2,12 @@
 
 @section('content')
 
-@extends('layouts.app')
-
-@section('content')
 <a href="{{ url()->previous() }}"><button class="btn btn-danger">< Back</button></a>
     <h1 class="text-center mb-5">Transactions Sell Orders View</h1>
 
    
 
-    <div class="table-responsive border">
+    <div id="transactionsTableWrapper" class="table-responsive border">
         <table class="table table-striped table-hover">
             <thead>
                 <tr>
@@ -51,4 +48,3 @@
 @endsection
 
 
-@endsection

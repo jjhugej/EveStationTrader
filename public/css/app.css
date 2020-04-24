@@ -133,6 +133,10 @@ table td span {
   max-height: 30vh;
 }
 
+#transactionsTableWrapper {
+  max-height: 80vh;
+}
+
 #contentSection {
   width: 100%;
   height: 100%;

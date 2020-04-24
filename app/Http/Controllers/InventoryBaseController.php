@@ -99,16 +99,18 @@ class InventoryBaseController extends EveBaseController
 
            }
            $shoppingListItem = ShoppingListitem::where('id', $request->shoppingListItemID)->first();
-           $shoppingListItem->amount_purchased += $totalTransactionQuantity;
-           $shoppingListItem->purchase_price += $totalTransactionPurchasePrice;
-           if($shoppingListItem->amount <= $shoppingListItem->amount_purchased ){
-                $shoppingListItem->status = 'Purchased';
-           }else{
-
-               $shoppingListItem->status = 'Partially Purchased';
+           if($shoppingListItem !== null && $shoppingListItem !== 0){
+               $shoppingListItem->amount_purchased += $totalTransactionQuantity;
+               $shoppingListItem->purchase_price += $totalTransactionPurchasePrice;
+               if($shoppingListItem->amount <= $shoppingListItem->amount_purchased ){
+                    $shoppingListItem->status = 'Purchased';
+               }else{
+    
+                   $shoppingListItem->status = 'Partially Purchased';
+               }
+    
+               $shoppingListItem->save();
            }
-
-           $shoppingListItem->save();
 
            $request->session()->flash('status', 'Inventory Item Created And The Shopping List Has Been Updated!');
            
