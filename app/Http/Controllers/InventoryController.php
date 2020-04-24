@@ -75,13 +75,12 @@ class InventoryController extends InventoryBaseController
     {
         //TODO CHECK IF THE REQUEST COMING IN IS FROM SHOPPING LIST ITEM AND MARK THE SHOPPING LIST ITEM AMOUNT AS 
         //THE AMOUNT PURCHASED FROM THE TRANSACTIONS
-
-       // dd($request,$request->session(),  $request->session()->get('_previous')['url']);
-        
+               
                 
         $inventoryItem = $this->saveInventoryItemToDB($request);
 
-        return redirect('/inventory');
+        return redirect()->back();
+        //return redirect('/inventory');
     }
 
     /**

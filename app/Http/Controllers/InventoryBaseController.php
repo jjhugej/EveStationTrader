@@ -55,7 +55,7 @@ class InventoryBaseController extends EveBaseController
                 the proper data from the transaction_ID.
                 transaction_id_array also means that the request is coming from the shopping list item page
             */
-            //dd($request->transaction_id_array);
+           
             $totalTransactionQuantity = 0;
             $totalTransactionPurchasePrice = 0;
 
@@ -74,14 +74,14 @@ class InventoryBaseController extends EveBaseController
                 $inventoryInstance->type_id = $transaction->type_id;
                 $inventoryInstance->amount = $transaction->quantity;
                 $inventoryInstance->purchase_price = $transaction->unit_price;
-                if(isset($request->shoppingListItemID)){
 
+                if(isset($request->shoppingListItemID)){
                     $inventoryInstance->shopping_list_item_id = $request->shoppingListItemID;
                     $shoppingListItem = ShoppingListItem::where('id', $request->shoppingListItemID)->first();
                     $shoppingList = ShoppingList::where('id', $shoppingListItem->shopping_list_id)->first();
-                    $inventoryInstance->notes = 'Added from shopping list item ' . $shoppingListItem->name .
-                     ' from the shopping list ' . $shoppingList->name;
-                 }
+                    $inventoryInstance->notes = 'Added from shopping list item "' . $shoppingListItem->name .
+                    '" from the shopping list "' . $shoppingList->name . '"';
+                }
     
                  $inventoryInstance->save();
                
@@ -109,6 +109,8 @@ class InventoryBaseController extends EveBaseController
            }
 
            $shoppingListItem->save();
+
+           $request->session()->flash('status', 'Inventory Item Created And The Shopping List Has Been Updated!');
            
            return back();
 
@@ -116,10 +118,11 @@ class InventoryBaseController extends EveBaseController
             /*
                 if neither of these are set it means the user clicked the submit form 
                 on the shoppinglistitem page without actually selecting a transaction to link
-                ////////
-                NOTE TO SELF: return error message
+            
             */
-            return back();
+           
+            $request->session()->flash('error', 'You must select an item');
+            //return redirect()->back();
         }
         else{
             //else we validate and save the data normally
@@ -162,9 +165,9 @@ class InventoryBaseController extends EveBaseController
             }
     
             $inventoryInstance->save();
+            return $inventoryInstance;
         }
-
-        return $inventoryInstance;
+        
 
     }
     public function merge(Request $request){
@@ -182,23 +185,25 @@ class InventoryBaseController extends EveBaseController
             $totalAmount = 0;
             $totalPar = 0;
             $totalTaxesPaid = 0;
-           
+            
+            //this checks the items selected and makes sure they are the same item
             foreach($inventoryItemIDArray as $inventoryID){
-    
                 $inventoryItem = Inventory::where('id', $inventoryID)->first();
-    
+
                 if($typeIDCheck == null){
                     $typeIDCheck = $inventoryItem->type_id;
                 }
                 if($inventoryItem->type_id !== $typeIDCheck){
-                    //if this check is true the item types are different and cannot be merged
-                   
                     $request->session()->flash('error', 'You can only merge items of the same type');
-    
                     return back();
-                    //return error
+                }
+            }
+
+            //this updates the variables above with the combined information from all selected items
+            foreach($inventoryItemIDArray as $inventoryID){
     
-                }else{
+                $inventoryItem = Inventory::where('id', $inventoryID)->first();
+
                     $logisticsGroupID = $inventoryItem->logistics_group_id;
                     $totalPurchasePrice += $inventoryItem->purchase_price;
                     $totalSellPrice += $inventoryItem->sell_price;
@@ -207,11 +212,12 @@ class InventoryBaseController extends EveBaseController
                     $totalTaxesPaid += $inventoryItem->taxes_paid;
     
                     $inventoryItem->delete();
-                }
+                
                 
     
-                //dd('merge method', $inventoryItem);
             }
+
+            //new up an instance of inventory and use the variables which have been updated from the above block of code
     
             $mergedInventoryItem = new Inventory();
             $mergedInventoryItem->user_id = Auth::user()->id;
