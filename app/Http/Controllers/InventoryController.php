@@ -75,7 +75,7 @@ class InventoryController extends InventoryBaseController
     {
         //TODO CHECK IF THE REQUEST COMING IN IS FROM SHOPPING LIST ITEM AND MARK THE SHOPPING LIST ITEM AMOUNT AS 
         //THE AMOUNT PURCHASED FROM THE TRANSACTIONS
-               
+        //dd($request);
                 
         $inventoryItem = $this->saveInventoryItemToDB($request);
 
@@ -275,8 +275,8 @@ class InventoryController extends InventoryBaseController
             break;
             
             case 'delete':
-                //dd('delete', $request->input('inventory_item_id_array'));
-                //NOTE TO SELF:MAKE SURE ONLY ONE INVENTORY ITEM CANNOT BE MERGED
+                //NOTE TO SELF:MAKE SURE ONLY ONE INVENTORY ITEM CAN BE MERGED
+
                 if($request->has('inventory_item_id_array') == true ){
                     foreach($request->input('inventory_item_id_array') as $inventoryItemID){
                         $inventoryItem = Inventory::where('id', $inventoryItemID)->first();
@@ -298,6 +298,16 @@ class InventoryController extends InventoryBaseController
                             $associatedShoppingListItem->amount_purchased -= $inventoryItem->amount;
         
                             $associatedShoppingListItem->save();
+                        }
+
+                        //update the inventory id on the associated market order
+                        $associatedMarketOrder = MarketOrders::where('order_id', $inventoryItem->market_order_id)->first();
+
+                        if($associatedMarketOrder !== null && $associatedMarketOrder !== 0){
+                            $associatedMarketOrder->inventory_id = null;
+                            $associatedMarketOrder->notes = null;
+                            
+                            $associatedMarketOrder->save();
                         }
                         
                         $inventoryItem->delete();

@@ -115,6 +115,10 @@ table td span {
   width: 10%;
 }
 
+#marketOrdersTableWrapper {
+  max-height: 80vh;
+}
+
 #deliveryGroupTable {
   max-height: 40vh;
   display: block;

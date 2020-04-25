@@ -31,6 +31,7 @@ class CreateMarketOrdersTable extends Migration
             $table->bigInteger('type_id');
             $table->bigInteger('volume_remain');
             $table->bigInteger('volume_total');
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }

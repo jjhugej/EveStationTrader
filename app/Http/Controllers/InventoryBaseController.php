@@ -48,75 +48,28 @@ class InventoryBaseController extends EveBaseController
 
     public function saveInventoryItemToDB($request){
         $selectedCharacter = $this->getSelectedCharacter();
-      
+        
         if(isset($request->transaction_id_array)){
             /*
                 if the request has the property transaction_id_array we need to run logic to get 
                 the proper data from the transaction_ID.
                 transaction_id_array also means that the request is coming from the shopping list item page
             */
-           
-            $totalTransactionQuantity = 0;
-            $totalTransactionPurchasePrice = 0;
+
+           $this->processTransactionsAndSaveToDB($request, $selectedCharacter);
 
 
-           foreach($request->transaction_id_array as $transaction_id){
-               
-                $transaction = Transactions::where('transaction_id', $transaction_id)->get();               
+        }
+        elseif(isset($request->market_order_id_array)){
+            /*
+                if the request has the property market_order_id_array we need to run logic to get 
+                the proper data from the market orders.
+                market_order_id_array also means that the request is coming from the market orders page
+            */
 
-                $transaction = $this->resolveTypeIDToItemName($transaction)->first();
-               
-
-                $inventoryInstance = new Inventory();
-                $inventoryInstance->user_id = Auth::user()->id;
-                $inventoryInstance->character_id = $selectedCharacter->character_id;
-                $inventoryInstance->name = $transaction->typeName;
-                $inventoryInstance->type_id = $transaction->type_id;
-                $inventoryInstance->amount = $transaction->quantity;
-                $inventoryInstance->purchase_price = $transaction->unit_price;
-
-                if(isset($request->shoppingListItemID)){
-                    $inventoryInstance->shopping_list_item_id = $request->shoppingListItemID;
-                    $shoppingListItem = ShoppingListItem::where('id', $request->shoppingListItemID)->first();
-                    $shoppingList = ShoppingList::where('id', $shoppingListItem->shopping_list_id)->first();
-                    $inventoryInstance->notes = 'Added from shopping list item "' . $shoppingListItem->name .
-                    '" from the shopping list "' . $shoppingList->name . '"';
-                }
-    
-                 $inventoryInstance->save();
-               
-                //next we have to update the transaction with the shopping list item id to attach the two 
-                $transaction->shopping_list_item_id = $request->shoppingListItemID;
-                $transaction->inventory_id = $inventoryInstance->id;
-                unset($transaction->typeName);
-
-                $transaction->save();
-
-                 //update initialized variables with purchase price and quantity
-                $totalTransactionQuantity += $transaction->quantity;
-                $totalTransactionPurchasePrice += $transaction->unit_price;
-                
-
-           }
-           $shoppingListItem = ShoppingListitem::where('id', $request->shoppingListItemID)->first();
-           if($shoppingListItem !== null && $shoppingListItem !== 0){
-               $shoppingListItem->amount_purchased += $totalTransactionQuantity;
-               $shoppingListItem->purchase_price += $totalTransactionPurchasePrice;
-               if($shoppingListItem->amount <= $shoppingListItem->amount_purchased ){
-                    $shoppingListItem->status = 'Purchased';
-               }else{
-    
-                   $shoppingListItem->status = 'Partially Purchased';
-               }
-    
-               $shoppingListItem->save();
-           }
-
-           $request->session()->flash('status', 'Inventory Item Created And The Shopping List Has Been Updated!');
-           
-           return back();
-
-        }elseif(!isset($request->name) && !isset($request->transaction_id_array)){
+            $this->processMarketOrdersAndSaveToDB($request, $selectedCharacter);
+        }
+        elseif(!isset($request->name) && !isset($request->transaction_id_array)){
             /*
                 if neither of these are set it means the user clicked the submit form 
                 on the shoppinglistitem page without actually selecting a transaction to link
@@ -244,5 +197,126 @@ class InventoryBaseController extends EveBaseController
             return back();
         }
 
+    }
+
+    public function processTransactionsAndSaveToDB($request, $selectedCharacter){
+        /*
+                if the request has the property transaction_id_array we need to run logic to get 
+                the proper data from the transaction_ID.
+                transaction_id_array also means that the request is coming from the shopping list item page
+            */
+           //processTransactionsAndSaveToDB($request);
+
+            $totalTransactionQuantity = 0;
+            $totalTransactionPurchasePrice = 0;
+
+
+           foreach($request->transaction_id_array as $transaction_id){
+               
+                $transaction = Transactions::where('transaction_id', $transaction_id)->get();               
+
+                $transaction = $this->resolveTypeIDToItemName($transaction)->first();
+               
+
+                $inventoryInstance = new Inventory();
+                $inventoryInstance->user_id = Auth::user()->id;
+                $inventoryInstance->character_id = $selectedCharacter->character_id;
+                $inventoryInstance->name = $transaction->typeName;
+                $inventoryInstance->type_id = $transaction->type_id;
+                $inventoryInstance->amount = $transaction->quantity;
+                $inventoryInstance->purchase_price = $transaction->unit_price;
+
+                if(isset($request->shoppingListItemID)){
+                    $inventoryInstance->shopping_list_item_id = $request->shoppingListItemID;
+                    $shoppingListItem = ShoppingListItem::where('id', $request->shoppingListItemID)->first();
+                    $shoppingList = ShoppingList::where('id', $shoppingListItem->shopping_list_id)->first();
+                    $inventoryInstance->notes = 'Added from shopping list item "' . $shoppingListItem->name .
+                    '" from the shopping list "' . $shoppingList->name . '"';
+                }
+    
+                 $inventoryInstance->save();
+               
+                //next we have to update the transaction with the shopping list item id to attach the two 
+                $transaction->shopping_list_item_id = $request->shoppingListItemID;
+                $transaction->inventory_id = $inventoryInstance->id;
+                unset($transaction->typeName);
+
+                $transaction->save();
+
+                 //update initialized variables with purchase price and quantity
+                 //These variables are used to update the shopping list items purchase and quanity amounts
+                $totalTransactionQuantity += $transaction->quantity;
+                $totalTransactionPurchasePrice += $transaction->unit_price;
+                
+
+           }
+           $shoppingListItem = ShoppingListitem::where('id', $request->shoppingListItemID)->first();
+           if($shoppingListItem !== null && $shoppingListItem !== 0){
+               $shoppingListItem->amount_purchased += $totalTransactionQuantity;
+               $shoppingListItem->purchase_price += $totalTransactionPurchasePrice;
+               if($shoppingListItem->amount <= $shoppingListItem->amount_purchased ){
+                    $shoppingListItem->status = 'Purchased';
+               }else{
+    
+                   $shoppingListItem->status = 'Partially Purchased';
+               }
+    
+               $shoppingListItem->save();
+           }
+
+           $request->session()->flash('status', 'Inventory Item Created And The Shopping List Has Been Updated!');
+           
+           return back();
+    }
+
+    public function processMarketOrdersAndSaveToDB($request, $selectedCharacter){
+        //dd('process market orders ->inventorybaseController', $request);
+
+        // TODO: The request is properly coming here. Next we have to figure out how to save the market order as an inventory item
+        //and we should display a notification on market orders that are already assigned to an inventory item
+
+        foreach($request->market_order_id_array as $marketOrder_id){
+            $marketOrder = MarketOrders::where('order_id', $marketOrder_id)->get();
+            $marketOrder = $this->resolveStationIDToName($selectedCharacter, $marketOrder)->first();
+            $marketOrder->typeName = $this->resolveSingleTypeIDToItemName($marketOrder->type_id);
+            //update inventory id and add notes to migration for market  orders
+         
+            
+            $inventoryInstance = new Inventory();
+
+            $inventoryInstance->user_id = Auth::user()->id;
+            $inventoryInstance->character_id = $selectedCharacter->character_id;
+            $inventoryInstance->name = $marketOrder->typeName;
+            $inventoryInstance->type_id = $marketOrder->type_id;
+            $inventoryInstance->market_order_id = $marketOrder->order_id;
+            $inventoryInstance->amount = $marketOrder->volume_remain;
+            $inventoryInstance->sell_price = $marketOrder->unit_price;
+            $inventoryInstance->current_location = $marketOrder->locationName;
+            $inventoryInstance->notes = 'Added from market orders page';
+           
+            $inventoryInstance->save();
+           
+            //Update the market order to show that it was added to the inventory, and assign its respective inventory ID
+            //TODO: on market orders pages update to show that an item is already part of the inventory,
+            //AND remove its select box to prevent future inventory items from being made.
+            unset($marketOrder->typeName);
+            unset($marketOrder->locationName);
+
+            $marketOrder->inventory_id = $inventoryInstance->id;
+            $marketOrder->notes = $marketOrder->notes . ' .Quick Added To Inventory From The Market Orders Page.';
+            
+            $marketOrder->save();
+
+            
+        }
+
+        $request->session()->flash('status', 'Inventory Item(s) Created and Market Order Was Updated');
+
+        return back();
+
+
+
+
+        dd('end of processmarketorders');
     }
 }   
