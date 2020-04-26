@@ -15,7 +15,7 @@
 
         @csrf
 
-        <div class="table-responsive border mb-1">
+        <div id="inventoryTableWrapper" class="table-responsive border mb-1">
             <table class="table table-striped table-hover">
                 <thead>
                     <tr>
@@ -33,8 +33,8 @@
                 <tbody>
                     @foreach($items as $item)
                         <tr>
-                            <th><input type="checkbox" class="inventory_checkbox" name="inventory_item_id_array[]" value="{{$item->id}}"></th>
-                            <td class="fit" scope="row"><a href="{{ config('baseUrl') }}/inventory/{{$item->id}}">{{$item->name}}</a></th>
+                            <td><input type="checkbox" class="inventory_checkbox" name="inventory_item_id_array[]" value="{{$item->id}}"></td>
+                            <th class="fit" scope="row"><a href="{{ config('baseUrl') }}/inventory/{{$item->id}}">{{$item->name}}</a></th>
                             <td>@formatNumber($item->sell_price)</td>
                             <td>@formatNumber($item->amount)</td>
                             <td>@formatNumber($item->par)</td>

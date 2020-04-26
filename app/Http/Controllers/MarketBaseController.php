@@ -15,10 +15,10 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 class MarketBaseController extends EveBaseController
 {
+    //TODO: update inventory items attached to market orders whenever get market orders is called
+    //also get pars working
 
     public function getMarketOrdersForSelectedCharacter($character){    
-
-        //TODO: Differentiate between orders for each character and ALL market orders...
 
 
         $selectedCharacter = Character::where('user_id', Auth::user()->id)->where('is_selected_character', 1)->first();

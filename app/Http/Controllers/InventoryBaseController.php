@@ -264,7 +264,7 @@ class InventoryBaseController extends EveBaseController
                $shoppingListItem->save();
            }
 
-           $request->session()->flash('status', 'Inventory Item Created And The Shopping List Has Been Updated!');
+           $request->session()->flash('status', 'Inventory Item Created!');
            
            return back();
     }
@@ -310,7 +310,7 @@ class InventoryBaseController extends EveBaseController
             
         }
 
-        $request->session()->flash('status', 'Inventory Item(s) Created and Market Order Was Updated');
+        $request->session()->flash('status', 'Inventory Item(s) Created');
 
         return back();
 

@@ -63,32 +63,46 @@
                     <th scope="col">Volume</th>
                     <th scope="col">Location</th>
                     <th scope="col">Order Type</th>
+                    <th scope="col">Inventory</th>
                     <th scope="col">Character</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($marketOrders as $marketOrder)
                         <tr>
-                            @if($marketOrder->is_buy_order == true)
+
+                            @if($marketOrder->is_buy_order == true || $marketOrder->inventory_id !== null)
                                 <td></td>
-                            @else
-                                <td><input type="checkbox" class="market_order_checkbox" name="market_order_id_array[]" value={{$marketOrder->order_id}}></td>
+                            @elseif($marketOrder->is_buy_order !== true && $marketOrder->is_buy_order == 0)
+                                @if($marketOrder->inventory_id == null || $marketOrder->inventory_id == 0)
+                                    <td><input type="checkbox" class="market_order_checkbox" name="market_order_id_array[]" value={{$marketOrder->order_id}}></td>
+                                @endif
                             @endif
+
                             <th class="fit" scope="row"> <a href="/marketorders/{{$marketOrder->order_id}}">{{ $marketOrder->typeName}}</a></th>
                             <td>@convertNumberToCurrency($marketOrder->price)</td>
                             <td>@formatNumber($marketOrder->volume_remain) {{'/'}} @formatNumber($marketOrder->volume_total)</td>
                             <td>{{$marketOrder->locationName}}</td>
+
                             @if($marketOrder->is_buy_order == true)
                                 <td>Buy</td>
                             @else
                                 <td>Sell</td>
                             @endif
+
+                            @if($marketOrder->inventory_id !== null && $marketOrder->inventory_id !== 0)
+                                <td><a href="{{ config('baseUrl') }}/inventory/{{$marketOrder->inventory_id}}">View</a></td>
+                            @else
+                                <td>No</td>
+                            @endif
+
                             <td>{{$marketOrder->character_name}}</td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
+        <p>Note: You may only add existing sell orders or orders not associated with an inventory item</p>
         <input class="btn btn-success" id="submit_btn" type="submit" value="Add Items To Inventory">
     </form>
 

@@ -68,7 +68,7 @@
                     <tbody>
                         @foreach($transactionHistory as $transactionHistory)
                             <tr>
-                                @if($transactionHistory->is_buy !== 0)
+                                @if($transactionHistory->is_buy !== 0 || $transactionHistory->is_buy == true)
                                     <td><input type="checkbox" class="transaction_checkbox" name="transaction_id_array[]" value={{$transactionHistory->transaction_id}}></td>
                                     @else
                                     <td></td>

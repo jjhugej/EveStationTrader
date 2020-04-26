@@ -9,7 +9,7 @@
         <a class="col-md-4 btn btn-info" href="{{ config('baseUrl') }}/marketorders/search/sell">View Sell Orders</a>
     </div>
 
-    <div class="table-responsive border">
+    <div id="marketOrdersTableWrapper" class="table-responsive border">
         <table class="table table-striped table-hover">
             <thead>
                 <tr>
