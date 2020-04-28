@@ -53,7 +53,7 @@ class TransactionsBaseController extends EveBaseController
                     
                     //update the last transactions fetch for the selected character                    
                     $selectedCharacter = Character::where('user_id', Auth::user()->id)->where('is_selected_character', 1)->first();
-                    $selectedCharacter->next_available_esi_transactions_fetch = Carbon::now()->addminutes(60)->toDateTimeString(); 
+                    $selectedCharacter->next_available_esi_transactions_fetch = Carbon::now()->addminutes(2)->toDateTimeString(); 
         
                     $selectedCharacter->save();
                     
@@ -66,6 +66,8 @@ class TransactionsBaseController extends EveBaseController
     }
 
     public function saveTransactionsToDB($transactionHistorys){
+        
+        $transactionArray = [];
 
         foreach($transactionHistorys as $transactionHistory){
 
@@ -73,10 +75,9 @@ class TransactionsBaseController extends EveBaseController
            
             //first check if transaction exists in database already
            
-            if(Transactions::where('transaction_id', $transactionHistory->transaction_id)->first() !==null){
-
+            if(Transactions::where('transaction_id', $transactionHistory->transaction_id)->first() !== null){
                 $transactionHistoryInstance = Transactions::where('transaction_id', $transactionHistory->transaction_id)->first();
-
+                
                 $transactionHistoryInstance->user_id = Auth::user()->id;
                 $transactionHistoryInstance->character_id = $currentSelectedCharacter->character_id;
                 $transactionHistoryInstance->journal_ref_id = $transactionHistory->journal_ref_id;
@@ -89,15 +90,15 @@ class TransactionsBaseController extends EveBaseController
                 $transactionHistoryInstance->is_personal = $transactionHistory->is_personal;
                 $transactionHistoryInstance->date = $this->convertEsiDateTime($transactionHistory->date);
                 
+                //dd('if', $transactionHistoryInstance);  
                 $transactionHistoryInstance->save();
                 
-                //$transactionHistoryInstance = $this->resolveTypeIDToItemName($transactionHistoryInstance);
+                array_push($transactionArray, $transactionHistoryInstance);
 
             }else{
-
                 //else the transaction is not in the DB and needs to be newed up
                 $transactionHistoryInstance = new Transactions();
-
+                
                 $transactionHistoryInstance->user_id = Auth::user()->id;
                 $transactionHistoryInstance->character_id = $currentSelectedCharacter->character_id;
                 $transactionHistoryInstance->journal_ref_id = $transactionHistory->journal_ref_id;
@@ -110,14 +111,15 @@ class TransactionsBaseController extends EveBaseController
                 $transactionHistoryInstance->is_personal = $transactionHistory->is_personal;
                 $transactionHistoryInstance->date = $this->convertEsiDateTime($transactionHistory->date);
                 
+                //dd('else', $transactionHistoryInstance);
                 $transactionHistoryInstance->save();
-
-                //$transactionHistoryInstance = $this->resolveTypeIDToItemName($transactionHistoryInstance);
-                
+    
+                array_push($transactionArray, $transactionHistoryInstance);
             }
         }
-
-        return $transactionHistorys;
+        $transactionArray = collect($transactionArray);
+        //dd('transaction array collected', $transactionArray);
+        return $transactionArray;
 
        // dd('saveTransactionsToDB->transactionhistorys', $transactionHistorys);
     }

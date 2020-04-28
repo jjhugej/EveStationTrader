@@ -20,7 +20,8 @@
         @endif
         <p>Purchase Price: @formatNumber($item->purchase_price)</p>
         <p>Sell Price: @formatNumber($item->sell_price)</p>
-        <p>Amount: @formatNumber($item->amount)</p>
+        <p>Starting Amount: @formatNumber($item->amount)</p>
+        <p>Remaining Amount: @formatNumber($item->amount_remain)</p>
         <p>Par: @formatNumber($item->par)</p>
         <p>Current Location: {{$item->current_location}}</p>
         <p>Associated Character: {{$item->character_name}}</p>

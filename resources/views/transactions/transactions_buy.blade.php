@@ -2,7 +2,7 @@
 
 @section('content')
 
-<a href="{{ url()->previous() }}"><button class="btn btn-danger">< Back</button></a>
+<a href="{{ config('baseUrl') }}/transactions"><button class="btn btn-danger">< Transactions Home</button></a>
     <h1 class="text-center mb-5">Transactions Buy Orders View</h1>
 
     @if ($errors->any())
@@ -46,7 +46,15 @@
                         @if($searchMatches !== null)
                             @foreach($searchMatches as $searchMatch)
                                 <tr>
-                                    <td><input type="checkbox" class="transaction_checkbox" name="transaction_id_array[]" value={{$searchMatch->transaction_id}}></td>
+                                    @if($searchMatch->is_buy == true)
+                                        @if($searchMatch->inventory_id == null || $searchMatch->inventory_id == 0)
+                                            <td><input type="checkbox" class="transaction_checkbox" name="transaction_id_array[]" value={{$searchMatch->transaction_id}}></td>
+                                        @else
+                                            <td></td>
+                                        @endif
+                                    @else
+                                        <td></td>
+                                    @endif
                                     <td>{{$searchMatch->typeName}}</td>
                                     <td>@formatNumber($searchMatch->unit_price)</td>
                                     <td>@formatNumber($searchMatch->quantity)</td>

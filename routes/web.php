@@ -22,7 +22,7 @@ Route::get('/evelogin/response','EveLoginController@create');
 Route::get('/testlink', 'EveLoginController@show');
 
 //DashboardController
-Route::get('/dashboard', 'DashboardController@index')->middleware('auth');
+Route::get('/dashboard', 'DashboardController@index')->middleware('auth')   ;
 
 //Characters
 Route::get('/characters', 'Characters@index')->middleware('auth');

@@ -50,7 +50,11 @@ class InventoryController extends InventoryBaseController
             
         if($currentSelectedCharacter !== null && $currentSelectedCharacter->is_selected_character === 1){
             
-            $marketOrders = MarketOrders::where('user_id', Auth::user()->id)->get();
+            $marketOrders = MarketOrders::where('user_id', Auth::user()->id)
+                            ->where('is_buy_order', false)
+                            ->where('inventory_id', null)
+                            ->orWhere('inventory_id', 0)
+                            ->get();
             $marketOrders = $this->resolveTypeIDToItemName($marketOrders);
             $marketOrders = $this->resolveStationIDToName($currentSelectedCharacter, $marketOrders);
             $marketOrders = $this->resolveMultipleCharacterNamesFromIDs($marketOrders);
@@ -73,9 +77,6 @@ class InventoryController extends InventoryBaseController
      */
     public function store(Request $request)
     {
-        //TODO CHECK IF THE REQUEST COMING IN IS FROM SHOPPING LIST ITEM AND MARK THE SHOPPING LIST ITEM AMOUNT AS 
-        //THE AMOUNT PURCHASED FROM THE TRANSACTIONS
-        //dd($request);
                 
         $inventoryItem = $this->saveInventoryItemToDB($request);
 
@@ -117,19 +118,26 @@ class InventoryController extends InventoryBaseController
      */
     public function edit(Inventory $inventoryItem)
     {
-        //dd($inventoryItem);
+       
         $deliveryGroups = Logistics::where('user_id', Auth::user()->id)->orderBy('created_at','desc')->get();
         
         $currentSelectedCharacter = $this->getSelectedCharacter();
             
         if($currentSelectedCharacter !== null && $currentSelectedCharacter->is_selected_character === 1){
-            
-            $marketOrders = MarketOrders::where('user_id', Auth::user()->id)->get();
-            $marketOrders = $this->resolveTypeIDToItemName($marketOrders);
-            $marketOrders = $this->resolveStationIDToName($currentSelectedCharacter, $marketOrders);
-            $marketOrders = $this->resolveMultipleCharacterNamesFromIDs($marketOrders);
-            $marketOrders = $marketOrders->sortBy('typeName');
-
+            //if the inventory item already has an assigned market order do not send any new orders
+            if($inventoryItem->market_order_id !== null && $inventoryItem->market_order_id !== 0){
+                $marketOrders = [];
+            }else{
+                $marketOrders = MarketOrders::where('user_id', Auth::user()->id)
+                                            ->where('type_id', $inventoryItem->type_id)
+                                            ->where('is_buy_order', false)
+                                            ->get();
+                $marketOrders = $this->resolveTypeIDToItemName($marketOrders);
+                $marketOrders = $this->resolveStationIDToName($currentSelectedCharacter, $marketOrders);
+                $marketOrders = $this->resolveMultipleCharacterNamesFromIDs($marketOrders);
+                $marketOrders = $marketOrders->sortBy('typeName');
+            }
+      
         return view('inventory.inventory_edit', compact('inventoryItem','deliveryGroups', 'marketOrders')); 
 
         }else{
@@ -154,7 +162,7 @@ class InventoryController extends InventoryBaseController
         
         $validatedData = $request->validate([
         'name' => 'required|max:255',
-        'purchase_price' => 'required|max:255',
+        'purchase_price' => 'nullable|max:255',
         'sell_price' => 'nullable|max:255',
         'par' => 'integer|nullable',
         'amount' => 'integer|nullable',
@@ -269,26 +277,24 @@ class InventoryController extends InventoryBaseController
 
             case 'merge':
                 $mergedInventoryItem = $this->merge($request);
-                //NOTE TO SELF:MAKE SURE ONLY ONE INVENTORY ITEM CANNOT BE MERGED
-                //$this->updatetransaction($mergedInventoryItem);
                 return back();
             break;
             
             case 'delete':
-                //NOTE TO SELF:MAKE SURE ONLY ONE INVENTORY ITEM CAN BE MERGED
-
                 if($request->has('inventory_item_id_array') == true ){
                     foreach($request->input('inventory_item_id_array') as $inventoryItemID){
                         $inventoryItem = Inventory::where('id', $inventoryItemID)->first();
     
     
                         //delete the inventory id from its respective transaction
-                        $associatedTransaction = Transactions::where('inventory_id', $inventoryItemID)->first();
-
-                        if($associatedTransaction !== null && $associatedTransaction !== 0){
-                            $associatedTransaction->inventory_id = 0;
-        
-                            $associatedTransaction->save();
+                        $associatedTransactions = Transactions::where('inventory_id', $inventoryItemID)->get();
+                        
+                        foreach($associatedTransactions as $associatedTransaction){
+                            if($associatedTransaction !== null && $associatedTransaction !== 0){
+                                $associatedTransaction->inventory_id = 0;
+            
+                                $associatedTransaction->save();
+                            }
                         }
     
                         //update the purchase price and amount purchased for the related shopping list item

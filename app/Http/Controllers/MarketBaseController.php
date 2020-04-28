@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Character;
 use App\User;
+use App\Inventory;
 use App\MarketOrders;
 use App\EveItem;
 use App\StructureName;
@@ -60,7 +61,6 @@ class MarketBaseController extends EveBaseController
             
                     $selectedCharacter->save();
                     
-
                     return($data);
                 }   
                 catch(Exception $e){
@@ -148,6 +148,23 @@ class MarketBaseController extends EveBaseController
         
         
         return $marketOrderArray;
+    }
+
+    public function updateAttachedInventoryItems($marketOrders){
+        //dd($marketOrders);
+        foreach($marketOrders as $marketOrder){
+         
+            if($marketOrder->inventory_id !== null && $marketOrder->inventory_id !== 0){
+                $attachedInventoryItem = Inventory::where('id', $marketOrder->inventory_id)->first();
+                if($attachedInventoryItem !== null && $attachedInventoryItem !==0){
+                    $attachedInventoryItem->amount_remain = $marketOrder->volume_remain;
+                    $attachedInventoryItem->sell_price = $marketOrder->price;
+    
+                    $attachedInventoryItem->save();
+                }
+            }
+        }
+        
     }
 
 }

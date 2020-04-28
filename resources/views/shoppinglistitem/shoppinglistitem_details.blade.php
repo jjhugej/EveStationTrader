@@ -52,6 +52,7 @@
                         <th scope="col">Item</th>
                         <th scope="col">Unit Price</th>
                         <th scope="col">Quantity</th>
+                        <th scope="col">Transaction Type </th>
                         <th scope="col">Date</th>
                     </tr>
                 </thead>
@@ -65,6 +66,11 @@
                             <td>{{$transaction->typeName}}</td>
                             <td>@formatNumber($transaction->unit_price)</td>
                             <td>@formatNumber($transaction->quantity)</td>
+                            @if($transaction->is_buy == 1)
+                                <td>Buy</td>
+                            @else
+                                <td>Sell</td>
+                            @endif
                             <td>{{date('d-M-y', strtotime($transaction->date))}}</td>
                             <td> <a href="#">quick add</a></td>     
                         </tr>

@@ -61,6 +61,7 @@
                             <th scope="col">Item</th>
                             <th scope="col">Unit Price</th>
                             <th scope="col">Quantity</th>
+                            <th scope="col">Inventory</th>
                             <th scope="col">Order Type</th>
                             <th scope="col">Date</th>
                         </tr>
@@ -68,14 +69,23 @@
                     <tbody>
                         @foreach($transactionHistory as $transactionHistory)
                             <tr>
-                                @if($transactionHistory->is_buy !== 0 || $transactionHistory->is_buy == true)
+                                @if($transactionHistory->is_buy == true)
+                                    @if($transactionHistory->inventory_id == null || $transactionHistory->inventory_id == 0)
                                     <td><input type="checkbox" class="transaction_checkbox" name="transaction_id_array[]" value={{$transactionHistory->transaction_id}}></td>
+                                    @else
+                                    <td></td>
+                                    @endif
                                     @else
                                     <td></td>
                                 @endif
                                 <td>{{$transactionHistory->typeName}}</td>
                                 <td>@formatNumber($transactionHistory->unit_price)</td>
                                 <td>@formatNumber($transactionHistory->quantity)</td>
+                                @if($transactionHistory->inventory_id !== null && $transactionHistory->inventory_id !== 0)
+                                <td><a href="{{ config('baseUrl') }}/inventory/{{$transactionHistory->inventory_id}}">View</a></td>
+                                @else
+                                    <td>None</td>
+                                @endif
                         
                                 @if($transactionHistory->is_buy == 0)
                                     <td>Sell</td>
@@ -89,6 +99,7 @@
                     </tbody>
                 </table>
             </div>
+            <p>Note:only completed "buy" transactions may be added to inventory</p>
             <input class="btn btn-success" id="submit_btn" type="submit" value="Add Items To Inventory">
     </form>
 

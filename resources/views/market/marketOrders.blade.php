@@ -71,18 +71,18 @@
                     @foreach($marketOrders as $marketOrder)
                         <tr>
 
-                            @if($marketOrder->is_buy_order == true || $marketOrder->inventory_id !== null)
+                            @if($marketOrder->is_buy_order == true)
                                 <td></td>
-                            @elseif($marketOrder->is_buy_order !== true && $marketOrder->is_buy_order == 0)
-                                @if($marketOrder->inventory_id == null || $marketOrder->inventory_id == 0)
-                                    <td><input type="checkbox" class="market_order_checkbox" name="market_order_id_array[]" value={{$marketOrder->order_id}}></td>
-                                @endif
+                            @elseif($marketOrder->inventory_id == null || $marketOrder->inventory_id == 0)
+                                <td><input type="checkbox" class="market_order_checkbox" name="market_order_id_array[]" value={{$marketOrder->order_id}}></td>
+                            @else
+                                <td></td>
                             @endif
 
                             <th class="fit" scope="row"> <a href="/marketorders/{{$marketOrder->order_id}}">{{ $marketOrder->typeName}}</a></th>
                             <td>@convertNumberToCurrency($marketOrder->price)</td>
                             <td>@formatNumber($marketOrder->volume_remain) {{'/'}} @formatNumber($marketOrder->volume_total)</td>
-                            <td>{{$marketOrder->locationName}}</td>
+                            <td class="textTruncate">{{$marketOrder->locationName}}</td>
 
                             @if($marketOrder->is_buy_order == true)
                                 <td>Buy</td>
@@ -93,7 +93,7 @@
                             @if($marketOrder->inventory_id !== null && $marketOrder->inventory_id !== 0)
                                 <td><a href="{{ config('baseUrl') }}/inventory/{{$marketOrder->inventory_id}}">View</a></td>
                             @else
-                                <td>No</td>
+                                <td class="text-danger">No</td>
                             @endif
 
                             <td>{{$marketOrder->character_name}}</td>
@@ -106,5 +106,6 @@
         <input class="btn btn-success" id="submit_btn" type="submit" value="Add Items To Inventory">
     </form>
 
+    
     <script type="text/javascript" src="{{asset('js/marketOrder_search.js')}}"></script>
 @endsection

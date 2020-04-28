@@ -16,9 +16,8 @@ use GuzzleHttp\Exception\ServerException;
 
 class MarketOrdersController extends MarketBaseController
 
-//TODO: UPDATE MARKET TRANSACTIONS THAT ARE ASSIGNED AN INVENTORY ITEM
-// SO THAT USERS CANT ADD THE SAME MARKET ORDER TO TWO DIFFERENT INVENTORY ITEMS
-//ALSO- REMOVE THE CHECKBOX ON THE MARKET PAGE FOR ITEMS IN THE INVENTORY
+//TODO: CHECK PAR AMOUNTS AND UPDATE CONTROLLER
+
 
 
 {
@@ -44,6 +43,8 @@ class MarketOrdersController extends MarketBaseController
             $marketOrders = $this->resolveTypeIDToItemName($marketOrders);
 
             $marketOrders = $this->resolveStationIDToName($currentSelectedCharacter, $marketOrders);
+
+            $this->updateAttachedInventoryItems($marketOrders);
 
             $marketOrders = collect($marketOrders)->sortBy('typeName');
 

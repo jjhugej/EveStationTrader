@@ -9,3 +9,21 @@
 #inventoryTableWrapper {
     max-height: 80vh;
 }
+.underParBorder {
+    border: solid 3px #dc3545 !important;
+}
+.underParBg {
+    background-color: #ffeb99 !important;
+}
+.underParBg:hover {
+    background-color: #ffefaf !important;
+}
+.table td {
+    max-width: 120px;
+}
+.textTruncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}

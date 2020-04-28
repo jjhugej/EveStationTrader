@@ -29,7 +29,7 @@ class TransactionsController extends TransactionsBaseController
 
             $transactionHistory = collect($transactionHistory)->sortByDesc('date');
 
-            //dd('index method->resolveTypeIDToItemName()', $transactionHistory);
+           
 
             return view('transactions.transactions', compact('transactionHistory'));
         }

@@ -2,7 +2,6 @@
 
 @section('content')
     <h1 class="text-center">Add An Item</h1>
-
     @if ($errors->any())
         <div class="alert alert-danger">
             <ul>
@@ -10,6 +9,17 @@
                     <li>{{ $error }}</li>
                 @endforeach
             </ul>
+        </div>
+    @endif
+    @if(Session::has('error'))
+        <div class="alert alert-danger">
+        {{ Session::get('error')}}
+        </div>
+    @endif
+    
+    @if(Session::has('status'))
+        <div class="alert alert-success">
+        {{ Session::get('status')}}
         </div>
     @endif
 

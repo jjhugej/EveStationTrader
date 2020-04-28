@@ -80,6 +80,7 @@ class InventoryBaseController extends EveBaseController
             //return redirect()->back();
         }
         else{
+           
             //else we validate and save the data normally
             $validatedData = $request->validate([
             'name' => 'required|max:255',
@@ -120,6 +121,18 @@ class InventoryBaseController extends EveBaseController
             }
     
             $inventoryInstance->save();
+
+            //now update the market order the inventory item was assigned to, so that they are attached
+            $associatedMarketOrder = MarketOrders::where('order_id', $inventoryInstance->market_order_id)->first();
+            
+            if($associatedMarketOrder !== null && $associatedMarketOrder !== 0){
+                $associatedMarketOrder->inventory_id = $inventoryInstance->id;
+
+                $associatedMarketOrder->save();
+            }
+            
+            $request->session()->flash('status', 'Inventory Item Created!');
+
             return $inventoryInstance;
         }
         
@@ -135,13 +148,13 @@ class InventoryBaseController extends EveBaseController
     
             $typeIDCheck = null;
             $logisticsGroupID = null;
-            $totalPurchasePrice = 0;
-            $totalSellPrice = 0;
+            $avgPurchasePriceArray = [];
+            $avgSellPriceArray = [];
             $totalAmount = 0;
             $totalPar = 0;
             $totalTaxesPaid = 0;
             
-            //this checks the items selected and makes sure they are the same item
+            //this checks the items selected and makes sure they are the same type of item
             foreach($inventoryItemIDArray as $inventoryID){
                 $inventoryItem = Inventory::where('id', $inventoryID)->first();
 
@@ -160,17 +173,18 @@ class InventoryBaseController extends EveBaseController
                 $inventoryItem = Inventory::where('id', $inventoryID)->first();
 
                     $logisticsGroupID = $inventoryItem->logistics_group_id;
-                    $totalPurchasePrice += $inventoryItem->purchase_price;
-                    $totalSellPrice += $inventoryItem->sell_price;
+                    array_push($avgPurchasePriceArray, $inventoryItem->purchase_price);
+                    array_push($avgSellPriceArray, $inventoryItem->sell_price);
                     $totalAmount += $inventoryItem->amount;
                     $totalPar += $inventoryItem->par;
                     $totalTaxesPaid += $inventoryItem->taxes_paid;
-    
-                    $inventoryItem->delete();
-                
-                
-    
+                   
             }
+            // average out the array values for avgpurchase price
+
+            $avgPurchasePrice = array_sum($avgPurchasePriceArray) / count($avgPurchasePriceArray);
+
+            $avgSellPrice = array_sum($avgSellPriceArray) / count($avgSellPriceArray);
 
             //new up an instance of inventory and use the variables which have been updated from the above block of code
     
@@ -180,14 +194,38 @@ class InventoryBaseController extends EveBaseController
             $mergedInventoryItem->type_id = $typeIDCheck;
             $mergedInventoryItem->name = $this->resolveSingleTypeIDToItemName($typeIDCheck);
             $mergedInventoryItem->logistics_group_id = $logisticsGroupID;
-            $mergedInventoryItem->purchase_price = $totalPurchasePrice;
-            $mergedInventoryItem->sell_price = $totalSellPrice;
+            $mergedInventoryItem->purchase_price = $avgPurchasePrice;
+            $mergedInventoryItem->sell_price = $avgSellPrice;
             $mergedInventoryItem->amount = $totalAmount;
             $mergedInventoryItem->par = $totalPar;
             $mergedInventoryItem->taxes_paid = $totalTaxesPaid;
             $mergedInventoryItem->notes = 'Merged from multiple inventory items';
     
             $mergedInventoryItem->save();
+
+            //update any marketorders and/or transactions that were attached to the old inventory items and give them the new inventory item id
+            foreach($inventoryItemIDArray as $inventoryID){
+                $inventoryItem = Inventory::where('id', $inventoryID)->first();
+                
+                $associatedMarketOrder = MarketOrders::where('inventory_id', $inventoryID)->first();
+                if($associatedMarketOrder !== null && $associatedMarketOrder !== 0){
+                    $associatedMarketOrder->inventory_id = $mergedInventoryItem->id;
+                    
+                    $associatedMarketOrder->save();
+
+                }
+
+                $associatedTransaction = Transactions::where('inventory_id', $inventoryID)->first();
+                if($associatedTransaction !== null && $associatedTransaction !== 0){
+                    $associatedTransaction->inventory_id = $mergedInventoryItem->id;
+
+                    $associatedTransaction->save();
+                }
+                
+
+
+                $inventoryItem->delete();
+            }
     
             return $mergedInventoryItem;
         }else{

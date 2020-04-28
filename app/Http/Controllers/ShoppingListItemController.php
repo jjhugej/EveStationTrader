@@ -83,16 +83,12 @@ class ShoppingListItemController extends ShoppingListItemBaseController
      */
     public function show(ShoppingListItem $shoppingListItem)
     {
-        $assignedShoppingList = ShoppingList::where('user_id', Auth::user()->id)->where('id', $shoppingListItem->shopping_list_id)->first();
+        $assignedShoppingList = ShoppingList::where('user_id', Auth::user()->id)
+                                ->where('id', $shoppingListItem->shopping_list_id)->first();
     
         $transactions = $this->getTransactionsWithSameTypeID($shoppingListItem);
 
         $transactions = $this->resolveTypeIDToItemName($transactions);
-
-        //dd($transactions);
-
-        // TODO: FINISH AUTOMATIC TRANSACTION DETECTION
-
 
         return view('shoppinglistitem.shoppinglistitem_details', compact('shoppingListItem', 'assignedShoppingList','transactions'));
     }

@@ -95,6 +95,7 @@
         </div>
     </div>
     <h2 class="text-center">Assign Item To Market Order</h2>
+    <p> Note: this shows only sell orders currently on the market </p>
     <div class="table-responsive border mb-4">
             <table id="marketOrderGroupTable" class="table table-striped table-hover">
                 <thead>
@@ -109,6 +110,7 @@
                     </tr>
                 </thead>
                 <tbody id="js-market-order-target">
+                    
                     @foreach($marketOrders as $marketOrder)
                         <tr>
                             <th  scope="row">
@@ -123,8 +125,12 @@
                             <td>{{$marketOrder->character_name}}</td>
                         </tr>
                     @endforeach
+
                 </tbody>
             </table>
+            @if (count($marketOrders) < 1)
+                <p class="text-danger font-italic ml-2">This item is already assigned to a market order or there were no market orders found with this item</p>
+            @endif
         </div>
 
         <input class="btn btn-success btn-lg btn-block" type="submit" value="Edit Item"> 
