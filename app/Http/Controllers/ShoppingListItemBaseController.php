@@ -30,12 +30,14 @@ class ShoppingListItemBaseController extends ShoppingListBaseController
             $transactions = Transactions::where('user_id', Auth::user()->id)
             ->where('type_id', $shoppingListItem->type_id)
             ->where('is_buy', 1)
-            ->where('inventory_id', null)
-            ->orWhere('inventory_id', 0)
+            ->where(function($query){
+                $query->where('inventory_id', '<', 1)
+                    ->orWhereNull('inventory_id');//https://stackoverflow.com/questions/36371796/laravel-eloquent-where-field-is-x-or-null
+            })
             ->orderBy('date', 'desc')
             ->get();
-            //dd($transactions);
             return $transactions;
+            
         }
 
     

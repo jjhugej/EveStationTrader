@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 use App\Character;
 use App\User;
+use App\MarketOrders;
+use App\Transactions;
+use App\Inventory;
 use App\EveItemIDModel;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -13,29 +16,17 @@ use GuzzleHttp\Exception\ServerException;
 
 
 
-class DashboardController extends EveBaseController
+class DashboardController extends DashboardBaseController
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-        //this will be the landing page for the end user of this application. Most models will be used here
-        if(Auth::check()){
-            //first check if user is logged in. If not redirect login. then check for characters. if none, redirect to eve login page.
-            if($characters = auth()->user()->characters()->get() !== null){
-                $characters = auth()->user()->characters()->get();
-            }else{
-                //send to eve login if no characters found
-                dd('no character info found');
-            }
-        }else{
-            return redirect('/login');
-        }
-
-        return view('dashboard',compact('characters'));
+    public function index(Request $request)
+    {   
+        
+        return view('dashboard.dashboard');        
     }
 
     /**
@@ -102,5 +93,70 @@ class DashboardController extends EveBaseController
     public function destroy($id)
     {
         //
+    }
+
+    public function getDashboardStats(Request $request){
+
+        $currentSelectedCharacter = $this->getSelectedCharacter();
+
+        if($currentSelectedCharacter !== null && $currentSelectedCharacter->is_selected_character === 1){
+
+            $currentSelectedCharacter = $this->checkTokens($currentSelectedCharacter);
+
+            //set the character portrait
+            $character = Character::where('user_id', $currentSelectedCharacter->id)
+                                            ->where('is_selected_character', true)
+                                            ->first();
+
+            if($character->portrait !== null && $character->portrait !==0){
+                session(['characterPortrait' => $character->portrait]);
+            }
+            
+            //market orders
+            $marketOrders = $this->getMarketOrdersForDashboard($currentSelectedCharacter);
+            $totalIskOnMarket = $this->getTotalIskOnMarket($marketOrders);
+                
+              
+            //transactions
+            $transactionHistory = $this->getTransactionHistoryForDashboard($currentSelectedCharacter);
+
+            //shopping list
+            $numberOfShoppingListItemsNotPurchased = $this->getNumberOfShoppingListItemsNotPurchased($currentSelectedCharacter);
+            
+               
+
+
+            //delivery groups that need to be delivered
+            $undeliveredLogisticsGroups = $this->getUndeliveredLogisticsGroups($currentSelectedCharacter);
+            
+
+            //inventory
+            $inventoryStats = $this->getInventoryStats($currentSelectedCharacter);
+            
+            //pars
+            $inventoryItemsUnderPar = Inventory::where('user_id', $currentSelectedCharacter->id)
+                                                ->whereRaw('amount_remain < par')
+                                                ->get();
+
+            $inventoryItemsUnderParCount = count($inventoryItemsUnderPar);
+ 
+        }else{
+            //redirect to characters because none are selected and flash an error message
+
+            $request->session()->flash('error', 'You Must Select A Character Before Proceeding');
+
+            return redirect('/characters');
+        }
+        
+        return ([
+            'marketOrders' => $marketOrders,
+            'totalIskOnMarket' => $totalIskOnMarket,
+            'numberOfShoppingListItemsNotPurchased' => $numberOfShoppingListItemsNotPurchased,
+            'transactionHistory' => $transactionHistory,
+            'inventoryStats' => $inventoryStats,
+            'inventoryItemsUnderParCount' => $inventoryItemsUnderParCount,
+            'inventoryItemsUnderPar' => $inventoryItemsUnderPar,
+            'currentSelectedCharacter' => $currentSelectedCharacter
+        ]);
     }
 }

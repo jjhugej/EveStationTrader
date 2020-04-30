@@ -2,18 +2,26 @@
 
 
 
+Auth::routes();
+
+
+//Route::get('/testroute', 'TestItController@index');
+
+
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('dashboard');
+    //return view('welcome');
 });
 
-Auth::routes();
 Route::get('/logout', 'Auth\LoginController@logout');
 
+
+
 Route::get('/home', function(){
+  
     return redirect('/dashboard');
 });
 
-//eve sso routes
 
 
 //EveLoginController
@@ -22,7 +30,8 @@ Route::get('/evelogin/response','EveLoginController@create');
 Route::get('/testlink', 'EveLoginController@show');
 
 //DashboardController
-Route::get('/dashboard', 'DashboardController@index')->middleware('auth')   ;
+Route::get('/dashboard', 'DashboardController@index')->middleware('auth');
+Route::get('/getdashboardstats', 'DashboardController@getDashboardStats');
 
 //Characters
 Route::get('/characters', 'Characters@index')->middleware('auth');

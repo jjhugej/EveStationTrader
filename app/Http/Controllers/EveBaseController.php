@@ -389,6 +389,8 @@ class EveBaseController extends Controller
                 $currentSelectedCharacter = Character::where('character_id', $user->current_selected_character_id)->first();
                 
                 return $currentSelectedCharacter;
+            }else{
+                return redirect('/evelogin');
             }
         }else{
             return redirect('/login');

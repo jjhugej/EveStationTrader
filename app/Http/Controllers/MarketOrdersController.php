@@ -35,7 +35,7 @@ class MarketOrdersController extends MarketBaseController
         if($currentSelectedCharacter !== null && $currentSelectedCharacter->is_selected_character === 1){
 
             $currentSelectedCharacter = $this->checkTokens($currentSelectedCharacter);
-     
+    
             $marketOrders = $this->getMarketOrdersForSelectedCharacter($currentSelectedCharacter);
             
             $marketOrders = $this->saveMarketOrdersToDB($marketOrders);
