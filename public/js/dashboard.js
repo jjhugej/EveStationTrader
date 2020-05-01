@@ -1,7 +1,8 @@
 $(document).ready(function() {
     console.log("ready!");
-    $.get("getdashboardstats", function(data) {
-        console.log(data);
+    $.get("getdashboardstats").done(function(data) {
+        $("#loading").remove();
+        $("#contentSection").append(data);
     });
 });
 

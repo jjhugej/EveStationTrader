@@ -147,16 +147,18 @@ class DashboardController extends DashboardBaseController
 
             return redirect('/characters');
         }
+
+        return view('dashboard._dashboard_main', 
+                    compact(
+                        'marketOrders',
+                        'totalIskOnMarket',
+                        'numberOfShoppingListItemsNotPurchased',
+                        'transactionHistory',
+                        'inventoryStats',
+                        'inventoryItemsUnderParCount',
+                        'inventoryItemsUnderPar',
+                        'currentSelectedCharacter',
+                    ));
         
-        return ([
-            'marketOrders' => $marketOrders,
-            'totalIskOnMarket' => $totalIskOnMarket,
-            'numberOfShoppingListItemsNotPurchased' => $numberOfShoppingListItemsNotPurchased,
-            'transactionHistory' => $transactionHistory,
-            'inventoryStats' => $inventoryStats,
-            'inventoryItemsUnderParCount' => $inventoryItemsUnderParCount,
-            'inventoryItemsUnderPar' => $inventoryItemsUnderPar,
-            'currentSelectedCharacter' => $currentSelectedCharacter
-        ]);
     }
 }
