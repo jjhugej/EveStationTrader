@@ -31,7 +31,7 @@
 <div class="container mb-3">
   <div class="row">
     <div class="col-lg">
-      <p class="text-center">Market Orders</p>
+      <h5 class="text-center">Market Orders</h5>
       <hr class="w-50">
     
       <div class="table-responsive table-height-override mb-3">
@@ -68,7 +68,7 @@
   <div class="row">
     <div class="col-lg">
 
-      <p class="text-center">Recent Transactions</p>
+      <h5 class="text-center">Recent Transactions</h5>
       <hr class="w-50">
 
       <div class="table-responsive table-height-override">
