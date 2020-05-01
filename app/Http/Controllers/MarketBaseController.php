@@ -56,7 +56,7 @@ class MarketBaseController extends EveBaseController
 
                     //update the last market fetch for the selected character   
                     $selectedCharacter = Character::where('user_id', Auth::user()->id)->where('is_selected_character', 1)->first();
-                    $selectedCharacter->next_available_esi_market_fetch = Carbon::now()->addminutes(2)->toDateTimeString(); 
+                    $selectedCharacter->next_available_esi_market_fetch = Carbon::now()->addminutes(20)->toDateTimeString(); 
         
             
                     $selectedCharacter->save();

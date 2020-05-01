@@ -1,84 +1,125 @@
-<h1>test</h1>
-<!-- Top Box -->
-    <div id= "dashboardTopBoxWrapper" class="row">
-        <div class="col-md dashboardTopBox">
-            <h1>{{$inventoryItemsUnderParCount}}</h1>
-            <p>Items Under Par</p>
-        </div>
 
-        <div class="col-md dashboardTopBox">
-            <h1>182</h1>
-            <p>Items On Market</p>
-        </div>
+<!-- top section -->
 
-        <div class="col-md dashboardTopBox">
-            <h1>12</h1>
-            <p>Items In Cart</p>
-        </div>
+<div class="container mb-3">
+  <div class="row">
+    <div class="col-md border text-center p-4 m-2">
+        <span class="font-weight-bold">@formatNumber($inventoryStats['numberOfInventoryItemsNotOnMarket'])</span>
+        <hr class="w-50">
+        <p class="font-italic">items not on market</p>
+      </div>
+    <div class="col-md border text-center p-4 m-2">
+      <span class="font-weight-bold">@formatNumber($totalIskOnMarket)</span>
+      <hr class="w-50">
+      <p class="font-italic">value of sell orders</p>
     </div>
-
-
-<!-- Middle Box -->
-<div id="dashboardMidBoxWrapper">
-    <h1 class="dashboardHeader">Market Orders:</h1>
-    <table class="table table-responsive table-striped">
-        <thead>
-            <tr>
-            <th scope="col">Name</th>
-            <th scope="col">Price</th>
-            <th scope="col">Volume</th>
-            <th scope="col">Station</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-            <td scope="row"><span>Tornadooooooooooooooooooooooooooooooooo</span></th>
-            <td><span>15,000,000000000000000000000000000000000000000000</span></td>
-            <td><span>40/100</span></td>
-            <td><span>PF-QHK</span></td>
-            </tr>
-            <tr>
-            <td scope="row">Gyrostabilizer</th>
-            <td>1,500,000</td>
-            <td>114/200</td>
-            <td>PF-QHK</td>
-            </tr>
-            <tr>
-            <td scope="row">Hail L</th>
-            <td>1,200</td>
-            <td>96,573/200,000</td>
-            <td>PF-QHK</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="col-md border text-center p-4 m-2">
+      <span class="font-weight-bold">@formatNumber($numberOfShoppingListItemsNotPurchased)</span>
+      <hr class="w-50">
+      <p class="font-italic">shopping orders unfilled</p>
+    </div>
+    <div class="col-md border text-center p-4 m-2">
+      <span class="font-weight-bold">@formatNumber($inventoryItemsUnderParCount)</span>
+      <hr class="w-50">
+      <p class="font-italic">items under par</p>
+    </div>
+  </div>
+  
 </div>
-<!-- Bottom Box -->
-    <div id="dashboardBotBoxWrapper">
-        <h1 class="dashboardHeader">Shopping List:</h1>
-        <div id="dashboardBotBox">
-            <table class="table">
-  <thead>
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">First</th>
-      <th scope="col">Last</th>
-      <th scope="col">Handle</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th scope="row">1</th>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
-    </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>@fat</td>
-    </tr>
-  </tbody>
-</table>
-        </div>
+
+<!-- Middle Section -->
+<div class="container mb-3">
+  <div class="row">
+    <div class="col-lg">
+      <p class="text-center">Market Orders</p>
+      <hr class="w-50">
+    
+      <div class="table-responsive table-height-override mb-3">
+        <table class="table table-sm">
+          <thead class="thead-light">
+            <tr>
+              <th scope="col">Item</th>
+              <th scope="col">Price</th>
+              <th scope="col">Volume</th>
+              <th scope="col">Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach($marketOrders as $marketOrder)
+            <tr>
+              <td scope="row">{{$marketOrder->typeName}}</th>
+              <td>@formatNumber($marketOrder->price)</td>
+              <td>@formatNumber($marketOrder->volume_remain)</td>
+              @if($marketOrder->is_buy_order == 1)
+                <td>buy</td>
+              @else
+                <td>sell</td>
+              @endif
+            </tr>
+            @endforeach
+          </tbody>
+        </table>
+      </div>
     </div>
+  </div>
+
+  
+  
+  <div class="row">
+    <div class="col-lg">
+
+      <p class="text-center">Recent Transactions</p>
+      <hr class="w-50">
+
+      <div class="table-responsive table-height-override">
+        <table class="table table-sm">
+          <thead class="thead-light">
+            <tr>
+              <th scope="col">Item</th>
+              <th scope="col">Price</th>
+              <th scope="col">Volume</th>
+              <th scope="col">Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach($transactionHistory as $transaction)
+            <tr>
+              <td scope="row">{{$transaction->typeName}}</th>
+              <td>@formatNumber($transaction->unit_price)</td>
+              <td>@formatNumber($transaction->quantity)</td>
+              @if($transaction->is_buy == 1)
+                <td>buy</td>
+              @else
+                <td>sell</td>
+              @endif
+            </tr>
+            @endforeach
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+    
+</div>
+    
+
+<!-- second card section -->
+  <div class="container mb-3">
+    <div class="row">
+      <div class="col-md border text-center p-4 m-2">
+        <span class="font-weight-bold">@formatNumber($inventoryStats['numberOfItemsInInventory'])</span>
+        <hr class="w-50">
+        <p class="font-italic">items in inventory</p>
+      </div>
+      <div class="col-md border text-center p-4 m-2">
+        <span class="font-weight-bold">@formatNumber($inventoryStats['totalIskAmountInInventory'])</span>
+        <hr class="w-50">
+        <p class="font-italic">value of inventory</p>
+      </div>
+      <div class="col-md border text-center p-4 m-2">
+      <span class="font-weight-bold"> @formatNumber($numberOfItemsOnMarket) </span>
+      <hr class="w-50">
+      <p class="font-italic">items on market</p>
+      </div>
+    </div>
+  </div>

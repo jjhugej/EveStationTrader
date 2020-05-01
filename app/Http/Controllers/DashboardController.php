@@ -114,8 +114,9 @@ class DashboardController extends DashboardBaseController
             
             //market orders
             $marketOrders = $this->getMarketOrdersForDashboard($currentSelectedCharacter);
+            $numberOfItemsOnMarket = count($marketOrders);
             $totalIskOnMarket = $this->getTotalIskOnMarket($marketOrders);
-                
+            
               
             //transactions
             $transactionHistory = $this->getTransactionHistoryForDashboard($currentSelectedCharacter);
@@ -147,10 +148,11 @@ class DashboardController extends DashboardBaseController
 
             return redirect('/characters');
         }
-
+        //dd($inventoryStats);
         return view('dashboard._dashboard_main', 
                     compact(
                         'marketOrders',
+                        'numberOfItemsOnMarket',
                         'totalIskOnMarket',
                         'numberOfShoppingListItemsNotPurchased',
                         'transactionHistory',
